@@ -1,6 +1,6 @@
 --
 -- MobDebug -- Lua remote debugger
--- Copyright 2011-18 Paul Kulchenko
+-- Copyright 2011-15 Paul Kulchenko
 -- Based on RemDebug 1.0 Copyright Kepler Project 2005
 --
 
@@ -19,7 +19,7 @@ end)("os")
 
 local mobdebug = {
   _NAME = "mobdebug",
-  _VERSION = "0.705",
+  _VERSION = "0.70",
   _COPYRIGHT = "Paul Kulchenko",
   _DESCRIPTION = "Mobile Remote Debugger for the Lua programming language",
   port = os and os.getenv and tonumber((os.getenv("MOBDEBUG_PORT"))) or 8172,
@@ -130,7 +130,7 @@ end
 local function q(s) return string.gsub(s, '([%(%)%.%%%+%-%*%?%[%^%$%]])','%%%1') end
 
 local serpent = (function() ---- include Serpent module for serialization
-local n, v = "serpent", "0.302" -- (C) 2012-18 Paul Kulchenko; MIT License
+local n, v = "serpent", "0.30" -- (C) 2012-17 Paul Kulchenko; MIT License
 local c, d = "Paul Kulchenko", "Lua serializer and pretty printer"
 local snum = {[tostring(1/0)]='1/0 --[[math.huge]]',[tostring(-1/0)]='-1/0 --[[-math.huge]]',[tostring(0/0)]='0/0'}
 local badtype = {thread = true, userdata = true, cdata = true}
@@ -183,10 +183,10 @@ local function s(t, opts)
       sref[#sref+1] = spath..space..'='..space..seen[t]
       return tag..'nil'..comment('ref', level) end
     -- protect from those cases where __tostring may fail
-    if type(mt) == 'table' and metatostring ~= false then
+    if type(mt) == 'table' then
       local to, tr = pcall(function() return mt.__tostring(t) end)
       local so, sr = pcall(function() return mt.__serialize(t) end)
-      if (to or so) then -- knows how to serialize itself
+      if (opts.metatostring ~= false and to or so) then -- knows how to serialize itself
         seen[t] = insref or spath
         t = so and sr or tr
         ttype = type(t)
@@ -221,7 +221,7 @@ local function s(t, opts)
           local path = seen[t]..'['..tostring(seen[key] or globals[key] or gensym(key))..']'
           sref[#sref] = path..space..'='..space..tostring(seen[value] or val2str(value,nil,indent,path))
         else
-          out[#out+1] = val2str(value,key,indent,nil,seen[t],plainindex,level+1)
+          out[#out+1] = val2str(value,key,indent,insref,seen[t],plainindex,level+1)
           if maxlen then
             maxlen = maxlen - #out[#out]
             if maxlen < 0 then break end
@@ -454,7 +454,7 @@ local function capture_vars(level, thread)
   -- including access to globals, but this causes vars[name] to fail in
   -- restore_vars on local variables or upvalues with `nil` values when
   -- 'strict' is in effect. To avoid this `rawget` is used in restore_vars.
-  setmetatable(vars, { __index = getfenv(func), __newindex = getfenv(func), __mode = "v" })
+  setmetatable(vars, { __index = getfenv(func), __newindex = getfenv(func) })
   return vars
 end
 
@@ -1163,12 +1163,8 @@ local function controller(controller_host, controller_port, scratchpad)
       if abort then
         if tostring(abort) == 'exit' then break end
       else
-        if status then -- no errors
-          if corostatus(coro_debugee) == "suspended" then
-            -- the script called `coroutine.yield` in the "main" thread
-            error("attempt to yield from the main thread", 3)
-          end
-          break -- normal execution is done
+        if status then -- normal execution is done
+          break
         elseif err and not string.find(tostring(err), deferror) then
           -- report the error back
           -- err is not necessarily a string, so convert to string to report
@@ -1405,9 +1401,9 @@ local function handle(params, client, options)
       elseif command == "reload" then
         client:send("LOAD 0 -\n")
       elseif command == "loadstring" then
-        local _, _, _, file, lines = string.find(exp, "^([\"'])(.-)%1%s(.+)")
+        local _, _, _, file, lines = string.find(exp, "^([\"'])(.-)%1%s+(.+)")
         if not file then
-           _, _, file, lines = string.find(exp, "^(%S+)%s(.+)")
+           _, _, file, lines = string.find(exp, "^(%S+)%s+(.+)")
         end
         client:send("LOAD " .. tostring(#lines) .. " " .. file .. "\n")
         client:send(lines)

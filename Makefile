@@ -1,7 +1,7 @@
 all: clean build
 
 clean:
-	@rm -Rf build
+	@rm -rf build
 
 build:
 	@mkdir build
