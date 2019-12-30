@@ -40,5 +40,5 @@ luac.out
 *.hex
 
 # Custom
-src/lib
-
+build
+.idea
