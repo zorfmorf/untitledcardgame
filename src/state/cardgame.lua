@@ -1,9 +1,9 @@
 local cardgame = {}
 
--- dimensions of areas
+--- dimensions of all card game areas. needs to be recalculated before it can be used
 local d = { pad = 10 }
 
---- calculate the dimensions of all card game areas depending on the current game window dimensions
+--- recalculate the dimensions of all card game areas depending on the current game window dimensions
 local function recalculateDimensions()
     local height = love.graphics.getHeight()
     local width = love.graphics.getWidth()
@@ -54,6 +54,7 @@ local function drawCardContainer(container, cardList)
         local originalW = res.card.placeholder:getWidth()
         local originalH = res.card.placeholder:getHeight()
         local s = 1 -- scale factor for card
+        local pad = d.pad -- might be necessary to use a separate padding
 
         -- only scale for height, for width we overlap cards if they don't fit into the area
         if originalH * s > maxH then
@@ -69,10 +70,10 @@ local function drawCardContainer(container, cardList)
         local h = math.floor(originalH * s)
 
         local xCenterOfContainer = container.x + maxW * 0.5
-        local widthOfAllCards = (#cardList - 1) * w
+        local widthOfAllCards = #cardList * w
 
         -- the x location of the leftmost card to draw (center of card)
-        local xLoc = math.floor( xCenterOfContainer - widthOfAllCards * 0.5)
+        local xLoc = math.floor( xCenterOfContainer - 0.5 * (widthOfAllCards - w) - (#cardList - 1) * 0.5 * pad)
 
         -- the y location for all cards in this container (center of card)
         local yLoc = math.floor(container.y + maxH * 0.5)
@@ -83,7 +84,7 @@ local function drawCardContainer(container, cardList)
             love.graphics.setColor(1.0, 1.0, 1.0)
 
             -- every card has a different x location
-            local x = xLoc + (i - 1) * w
+            local x = xLoc + (i - 1) * (w + pad)
             love.graphics.draw(res.card.placeholder, x,
                     yLoc, 0, s, s, math.floor(originalW * 0.5), math.floor(originalH * 0.5))
 
@@ -96,9 +97,10 @@ local function drawCardContainer(container, cardList)
 end
 
 
+--- Draw all card containers including their cards
 function cardgame:draw()
 
-    local drawOutline = true
+    local drawOutline = true -- debug outlines
 
     -- draw the top bar
     if drawOutline then love.graphics.rectangle("line", d.top.x, d.top.y, d.top.w, d.top.h) end
