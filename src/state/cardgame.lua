@@ -1,5 +1,8 @@
 local cardgame = {}
 
+--- draw debug outlines
+local drawDebugOutlines = false
+
 --- dimensions of all card game areas. needs to be recalculated before it can be used
 local d = { pad = 10 }
 
@@ -10,7 +13,7 @@ local function recalculateDimensions()
     d.pad = math.floor(height * 0.02)
     d.top = {
         x = d.pad,
-        y = d.pad,
+        y = 0,
         w = math.floor(width - d.pad * 2),
         h = math.floor(height* 0.1)
     }
@@ -30,7 +33,7 @@ local function recalculateDimensions()
         x = d.pad,
         y = d.pad + d.player.y + d.player.h,
         w = math.floor(width - d.pad * 2),
-        h = math.floor(height * 0.2 + d.pad)
+        h = math.floor(height * 0.24)
     }
 end
 
@@ -70,28 +73,37 @@ local function drawCardContainer(container, cardList)
         local h = math.floor(originalH * s)
 
         local xCenterOfContainer = container.x + maxW * 0.5
-        local widthOfAllCards = #cardList * w
+        local widthOfAllCards = #cardList * w + (#cardList - 1) * pad
 
         -- the x location of the leftmost card to draw (center of card)
-        local xLoc = math.floor( xCenterOfContainer - 0.5 * (widthOfAllCards - w) - (#cardList - 1) * 0.5 * pad)
+        local xLoc = math.floor( xCenterOfContainer - 0.5 * (widthOfAllCards - w))
+
+        -- if there are too many cards, they will exceed the container length. in this case overlap cards by shifting
+        local xShift = 0
+        if xLoc - w * 0.5 < container.x then
+            -- the amount the most left and right cards have to move "in" not to exceed their container bounds
+            xShift = container.x - (xLoc - w * 0.5)
+        end
 
         -- the y location for all cards in this container (center of card)
         local yLoc = math.floor(container.y + maxH * 0.5)
 
         -- just draw all cards from left to right
-        for i,c in ipairs(cardList) do
+        for i, _ in ipairs(cardList) do
 
-            love.graphics.setColor(1.0, 1.0, 1.0)
+            -- start from leftmost location and add width and padding for each additional card
+            -- xShift moves cards further to the center. the further away from the center, the more xShift is applied
+            local x = xLoc + (i - 1) * (w + pad) + xShift * (1 - ((i - 1) / (#cardList - 1)) * 2)
 
-            -- every card has a different x location
-            local x = xLoc + (i - 1) * (w + pad)
             love.graphics.draw(res.card.placeholder, x,
                     yLoc, 0, s, s, math.floor(originalW * 0.5), math.floor(originalH * 0.5))
 
-            -- debug point
-            love.graphics.setColor(1.0, 0.0, 0.0)
-            love.graphics.rectangle("fill", x - 1, yLoc - 1, 3, 3)
-            love.graphics.setColor(1.0, 1.0, 1.0)
+            -- draw a red dot to each card's draw position
+            if drawDebugOutlines then
+                love.graphics.setColor(1.0, 0.0, 0.0)
+                love.graphics.rectangle("fill", x - 1, yLoc - 1, 3, 3)
+                love.graphics.setColor(1.0, 1.0, 1.0)
+            end
         end
     end
 end
@@ -100,27 +112,25 @@ end
 --- Draw all card containers including their cards
 function cardgame:draw()
 
-    local drawOutline = true -- debug outlines
-
     -- draw the top bar
-    if drawOutline then love.graphics.rectangle("line", d.top.x, d.top.y, d.top.w, d.top.h) end
-    if drawOutline then love.graphics.printf("Top bar", d.top.x, d.top.y + 10, d.top.w, "center") end
+    if drawDebugOutlines then love.graphics.rectangle("line", d.top.x, d.top.y, d.top.w, d.top.h) end
+    if drawDebugOutlines then love.graphics.printf("Top bar", d.top.x, d.top.y + 10, d.top.w, "center") end
 
     -- draw the enemy area
-    if drawOutline then love.graphics.rectangle("line", d.enemy.x, d.enemy.y, d.enemy.w, d.enemy.h) end
-    if drawOutline then love.graphics.printf("Enemy area", d.enemy.x, d.enemy.y + 10, d.enemy.w, "center") end
+    if drawDebugOutlines then love.graphics.rectangle("line", d.enemy.x, d.enemy.y, d.enemy.w, d.enemy.h) end
+    if drawDebugOutlines then love.graphics.printf("Enemy area", d.enemy.x, d.enemy.y + 10, d.enemy.w, "center") end
     drawCardContainer(d.enemy, { 1, 2 })
 
     -- draw the player area
-    if drawOutline then love.graphics.rectangle("line", d.player.x, d.player.y, d.player.w, d.player.h) end
-    if drawOutline then love.graphics.printf("Player area", d.player.x, d.player.y + 10, d.player.w, "center") end
+    if drawDebugOutlines then love.graphics.rectangle("line", d.player.x, d.player.y, d.player.w, d.player.h) end
+    if drawDebugOutlines then love.graphics.printf("Player area", d.player.x, d.player.y + 10, d.player.w, "center") end
     drawCardContainer(d.player, { 1, 2, 3, 4, 5, 6, 7, 8 })
 
     -- draw the hand card area
-    if drawOutline then love.graphics.rectangle("line", d.hand.x, d.hand.y, d.hand.w, d.hand.h) end
-    if drawOutline then love.graphics.printf("Hand cards", d.hand.x, d.hand.y + 10, d.hand.w, "center") end
+    if drawDebugOutlines then love.graphics.rectangle("line", d.hand.x, d.hand.y, d.hand.w, d.hand.h) end
+    if drawDebugOutlines then love.graphics.printf("Hand cards", d.hand.x, d.hand.y + 10, d.hand.w, "center") end
 
-    if drawOutline then
+    if drawDebugOutlines then
         love.graphics.line(love.graphics.getWidth() * 0.5, 0, love.graphics.getWidth() * 0.5, love.graphics.getHeight())
     end
 end
