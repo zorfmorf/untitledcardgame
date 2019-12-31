@@ -1,6 +1,9 @@
+
+res = {}
+
 Gamestate = require "hump.gamestate"
 
-local state_card_game = require("state.cardgame")
+local state_card_game = require "state.cardgame"
 
 
 function love.load()
@@ -8,6 +11,9 @@ function love.load()
 
     Gamestate.registerEvents()
     Gamestate.switch(state_card_game)
+
+    love.graphics.setDefaultFilter( "nearest", "nearest" )
+    res = require "resource.loader" -- load after scaling filter has been set
 end
 
 
