@@ -51,36 +51,46 @@ local function drawCardContainer(container, cardList)
     if #cardList > 0 then
         local maxW = container.w
         local maxH = container.h
-        local w = res.card.placeholder:getWidth()
-        local h = res.card.placeholder:getHeight()
+        local originalW = res.card.placeholder:getWidth()
+        local originalH = res.card.placeholder:getHeight()
         local s = 1 -- scale factor for card
 
         -- only scale for height, for width we overlap cards if they don't fit into the area
-        if h * s > maxH then
+        if originalH * s > maxH then
             s = 0.5
         else
-            if h * s < maxH * 0.5 then
+            if originalH * s < maxH * 0.5 then
                 s = 2
             end
         end
 
-        -- the location to the left we start to draw cards from (center of card)
-        local xLoc = math.floor(0.5 * (container.x + maxW - (#cardList - 1) * w * s + d.pad * (1 - (#cardList - 1))))
+        -- Use actual display width of cards for draw position calculation
+        local w = math.floor(originalW * s)
+        local h = math.floor(originalH * s)
 
-        -- calculate buffer for when the container width is too small for the amount of cards so we have to overlap them
-        local xLeftShift = 0
-        if xLoc - w * 0.5 < container.x then
-            xLeftShift = (container.x - (xLoc - w * 0.5))
-            xLoc = container.x + math.floor(w * 0.5)
-        end
+        local xCenterOfContainer = container.x + maxW * 0.5
+        local widthOfAllCards = (#cardList - 1) * w
 
-        -- the y location, top of the card
+        -- the x location of the leftmost card to draw (center of card)
+        local xLoc = math.floor( xCenterOfContainer - widthOfAllCards * 0.5)
+
+        -- the y location for all cards in this container (center of card)
         local yLoc = math.floor(container.y + maxH * 0.5)
 
         -- just draw all cards from left to right
         for i,c in ipairs(cardList) do
-            love.graphics.draw(res.card.placeholder, math.floor(xLoc + (i - 1) * (w * s + d.pad - xLeftShift)),
-                    yLoc, 0, s, s, math.floor(w * 0.5 * s), math.floor(h * 0.5 * s))
+
+            love.graphics.setColor(1.0, 1.0, 1.0)
+
+            -- every card has a different x location
+            local x = xLoc + (i - 1) * w
+            love.graphics.draw(res.card.placeholder, x,
+                    yLoc, 0, s, s, math.floor(originalW * 0.5), math.floor(originalH * 0.5))
+
+            -- debug point
+            love.graphics.setColor(1.0, 0.0, 0.0)
+            love.graphics.rectangle("fill", x - 1, yLoc - 1, 3, 3)
+            love.graphics.setColor(1.0, 1.0, 1.0)
         end
     end
 end
@@ -97,12 +107,12 @@ function cardgame:draw()
     -- draw the enemy area
     if drawOutline then love.graphics.rectangle("line", d.enemy.x, d.enemy.y, d.enemy.w, d.enemy.h) end
     if drawOutline then love.graphics.printf("Enemy area", d.enemy.x, d.enemy.y + 10, d.enemy.w, "center") end
-    drawCardContainer(d.enemy, { 1, 2, 3 })
+    drawCardContainer(d.enemy, { 1, 2 })
 
     -- draw the player area
     if drawOutline then love.graphics.rectangle("line", d.player.x, d.player.y, d.player.w, d.player.h) end
     if drawOutline then love.graphics.printf("Player area", d.player.x, d.player.y + 10, d.player.w, "center") end
-    drawCardContainer(d.player, { 1, 2, 3, 4 })
+    drawCardContainer(d.player, { 1, 2, 3, 4, 5, 6, 7, 8 })
 
     -- draw the hand card area
     if drawOutline then love.graphics.rectangle("line", d.hand.x, d.hand.y, d.hand.w, d.hand.h) end
