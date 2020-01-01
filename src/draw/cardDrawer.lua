@@ -1,0 +1,106 @@
+
+local d = {}
+
+
+--- Draws all given cards into the specified container
+---@return s the scaling used for the card
+function d:drawCardContainer(container, cardList)
+    local s = 1 -- scale factor for card
+    if #cardList > 0 then
+        local maxW = container.w
+        local maxH = container.h
+        local originalW = res.card.placeholder:getWidth()
+        local originalH = res.card.placeholder:getHeight()
+        local pad = container.pad -- might be necessary to use a separate padding
+
+        -- at least one card must fit into the container, so scale down card as long as necessary
+        if originalH * s > maxH or originalW * s > maxW then
+            while originalH * s > maxH or originalW * s > maxW do
+                s = s * 0.5
+            end
+        else
+            -- if there is a lot of space in the container, we can upscale card size to fill it out better
+            while originalH * s < maxH * 0.5 and originalW * s < maxW * 0.5 do
+                s = s * 2
+            end
+        end
+
+        -- Use actual display width of cards for draw position calculation
+        local w = math.floor(originalW * s)
+        local h = math.floor(originalH * s)
+
+        local xCenterOfContainer = container.x + maxW * 0.5
+        local widthOfAllCards = #cardList * w + (#cardList - 1) * pad
+
+        -- the x location of the leftmost card to draw (center of card)
+        local xLoc = math.floor( xCenterOfContainer - 0.5 * (widthOfAllCards - w))
+
+        -- if there are too many cards, they will exceed the container length. in this case overlap cards by shifting
+        local xShift = 0
+        if xLoc - w * 0.5 < container.x then
+            -- the amount the most left and right cards have to move "in" not to exceed their container bounds
+            xShift = container.x - (xLoc - w * 0.5)
+        end
+
+        -- the y location for all cards in this container (center of card)
+        local yLoc = math.floor(container.y + maxH * 0.5)
+
+        -- just draw all cards from left to right
+        for i, _ in ipairs(cardList) do
+
+            -- start from leftmost location and add width and padding for each additional card
+            local x = xLoc + (i - 1) * (w + pad)
+
+            -- xShift moves cards further to the center. the further away from the center, the more xShift is applied
+            if #cardList > 1 then
+                x = x + xShift * (1 - ((i - 1) / (#cardList - 1)) * 2)
+            end
+
+            love.graphics.draw(res.card.placeholder, x,
+                    yLoc, 0, s, s, math.floor(originalW * 0.5), math.floor(originalH * 0.5))
+
+            -- draw a red dot to each card's draw position
+            if drawDebugOutlines then
+                love.graphics.setColor(1.0, 0.0, 0.0)
+                love.graphics.rectangle("fill", x - 1, yLoc - 1, 3, 3)
+                love.graphics.setColor(1.0, 1.0, 1.0)
+            end
+        end
+    end
+    return s
+end
+
+
+local function getTextHeight(text, width, font)
+    local _, wrappedText = font:getWrap(text, width)
+    return #wrappedText * font:getHeight()
+end
+
+
+--- Draw the specified text into the given container
+function d:drawTextContainer(container, text, scale)
+
+    -- match the font size to the used scaling
+    local font = r.font.pixel
+    if scale >= 2 then font = r.font.pixelLarge end
+    if scale <= 0.5 then font = r.font.pixelSmall end
+
+    -- first check how much space the text is going to need
+    local textHeight = getTextHeight(text, container.w, font)
+
+    -- if the font doesn't fit into the big box, we need to scale it down
+    if textHeight > container.h then
+        if scale >= 2 then
+            font = r.font.pixel
+        else
+            font = r.font.pixelSmall
+        end
+        textHeight = getTextHeight(text, container.w, font)
+    end
+
+    local y = math.floor(container.y + 0.5 * (container.h - textHeight))
+    love.graphics.printf( text, font, container.x, y, container.w)
+end
+
+
+return d

@@ -1,19 +1,30 @@
 
+--- draw debug information in screens. TODO move to config file
+drawDebugOutlines = false
+
 res = {}
 
-Gamestate = require "hump.gamestate"
+-- libraries
+GameState = require "hump.gamestate"
 
-local state_card_game = require "state.cardgame"
+
+-- helper tools
+love.graphics.setDefaultFilter( "nearest", "nearest" )
+res = require "draw.resourceLoader" -- load after scaling filter has been set
+cardDrawer = require "draw.cardDrawer"
+
+-- states
+local state_card_game = require "state.cardGame"
+local state_card_game_overlay = require "state.cardGameOverlay"
 
 
 function love.load()
     if arg[#arg] == "-debug" then require("mobdebug.mobdebug").start() end
 
-    Gamestate.registerEvents()
-    Gamestate.switch(state_card_game)
+    GameState.registerEvents()
+    --GameState.switch(state_card_game)
+    GameState.switch(state_card_game_overlay)
 
-    love.graphics.setDefaultFilter( "nearest", "nearest" )
-    res = require "resource.loader" -- load after scaling filter has been set
 end
 
 

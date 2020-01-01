@@ -5,8 +5,8 @@ clean:
 
 build:
 	@mkdir build
-	@mkdir build/img
-	@cp -r assets/* build/img/
+	@mkdir build/res
+	@cp -r assets/* build/res/
 	@cp -r src/* build/
 	@cp -r lib/* build/
 	@cd build; zip -r ucg.love *
