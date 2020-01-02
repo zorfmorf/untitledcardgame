@@ -1,4 +1,5 @@
 
+--- General definition of each existing card
 local cards = {}
 
 

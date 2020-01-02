@@ -2,7 +2,9 @@ local cardGame = {}
 
 
 --- dimensions of all card game areas. needs to be recalculated before it can be used
-local d = { pad = 10 }
+local d = {
+    id = "gameView"
+}
 
 --- recalculate the dimensions of all card game areas depending on the current game window dimensions
 local function recalculateDimensions()
@@ -10,6 +12,8 @@ local function recalculateDimensions()
     local width = love.graphics.getWidth()
     d.pad = math.floor(height * 0.02)
     d.top = {
+        id = d.id,
+        name = "Top bar",
         pad = d.pad,
         x = d.pad,
         y = 0,
@@ -17,6 +21,8 @@ local function recalculateDimensions()
         h = math.floor(height* 0.1)
     }
     d.enemy = {
+        id = d.id,
+        name = "Enemy card area",
         pad = d.pad,
         x = d.pad,
         y = d.pad + d.top.y + d.top.h,
@@ -24,6 +30,8 @@ local function recalculateDimensions()
         h = math.floor(height * 0.3)
     }
     d.player = {
+        id = d.id,
+        name = "Player card area",
         pad = d.pad,
         x = d.pad,
         y = d.pad + d.enemy.y + d.enemy.h,
@@ -31,6 +39,8 @@ local function recalculateDimensions()
         h = math.floor(height * 0.3)
     }
     d.hand = {
+        id = d.id,
+        name = "Player hand card area",
         pad = d.pad,
         x = d.pad,
         y = d.pad + d.player.y + d.player.h,
@@ -43,6 +53,16 @@ end
 --- Called when entering the state
 function cardGame:enter()
     self:resize()
+
+    -- TODO set this card in a global game state container
+    self.cardsEnemy = {}
+    for i=1,2 do
+        self.cardsEnemy[i] = Card(cards.placeholder)
+    end
+    self.cardsPlayer = {}
+    for i=1,5 do
+        self.cardsPlayer[i] = Card(cards.placeholder)
+    end
 end
 
 
@@ -52,29 +72,29 @@ function cardGame:resize()
 end
 
 
+--- Called on every game update cycle
+---@param dt number time since last update in seconds
+function cardGame:update(dt)
+    -- TODO get card lists from state
+    cardDrawer:updateCardDrawPositions(dt, d.enemy, self.cardsEnemy )
+    cardDrawer:updateCardDrawPositions(dt, d.player, self.cardsPlayer )
+end
+
+
 --- Draw all card containers including their cards
 function cardGame:draw()
 
-    -- TODO set this card in a global game state container
-    local card = Card(cards.placeholder)
-
     -- draw the top bar
-    if DRAW_DEBUG_OUTLINES then love.graphics.rectangle("line", d.top.x, d.top.y, d.top.w, d.top.h) end
-    if DRAW_DEBUG_OUTLINES then love.graphics.printf("Top bar", d.top.x, d.top.y + 10, d.top.w, "center") end
+    cardDrawer:drawCardContainer(d.top, {})
 
     -- draw the enemy area
-    if DRAW_DEBUG_OUTLINES then love.graphics.rectangle("line", d.enemy.x, d.enemy.y, d.enemy.w, d.enemy.h) end
-    if DRAW_DEBUG_OUTLINES then love.graphics.printf("Enemy area", d.enemy.x, d.enemy.y + 10, d.enemy.w, "center") end
-    cardDrawer:drawCardContainer(d.enemy, { card, card })
+    cardDrawer:drawCardContainer(d.enemy, self.cardsEnemy)
 
     -- draw the player area
-    if DRAW_DEBUG_OUTLINES then love.graphics.rectangle("line", d.player.x, d.player.y, d.player.w, d.player.h) end
-    if DRAW_DEBUG_OUTLINES then love.graphics.printf("Player area", d.player.x, d.player.y + 10, d.player.w, "center") end
-    cardDrawer:drawCardContainer(d.player, { card, card, card, card, card })
+    cardDrawer:drawCardContainer(d.player, self.cardsPlayer)
 
     -- draw the hand card area
-    if DRAW_DEBUG_OUTLINES then love.graphics.rectangle("line", d.hand.x, d.hand.y, d.hand.w, d.hand.h) end
-    if DRAW_DEBUG_OUTLINES then love.graphics.printf("Hand cards", d.hand.x, d.hand.y + 10, d.hand.w, "center") end
+    cardDrawer:drawCardContainer(d.hand, {})
 
     if DRAW_DEBUG_OUTLINES then
         love.graphics.line(love.graphics.getWidth() * 0.5, 0, love.graphics.getWidth() * 0.5, love.graphics.getHeight())

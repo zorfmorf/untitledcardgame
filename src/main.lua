@@ -28,8 +28,8 @@ function love.load()
     if arg[#arg] == "-debug" then require("mobDebug.mobDebug").start() end
 
     GameState.registerEvents()
-    GameState.switch(state_card_game)
-    --GameState.switch(state_card_game_overlay)
+    --GameState.switch(state_card_game)
+    GameState.switch(state_card_game_overlay)
 
 end
 
