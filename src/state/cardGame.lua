@@ -55,25 +55,28 @@ end
 --- Draw all card containers including their cards
 function cardGame:draw()
 
+    -- TODO set this card in a global game state container
+    local card = Card(cards.placeholder)
+
     -- draw the top bar
-    if drawDebugOutlines then love.graphics.rectangle("line", d.top.x, d.top.y, d.top.w, d.top.h) end
-    if drawDebugOutlines then love.graphics.printf("Top bar", d.top.x, d.top.y + 10, d.top.w, "center") end
+    if DRAW_DEBUG_OUTLINES then love.graphics.rectangle("line", d.top.x, d.top.y, d.top.w, d.top.h) end
+    if DRAW_DEBUG_OUTLINES then love.graphics.printf("Top bar", d.top.x, d.top.y + 10, d.top.w, "center") end
 
     -- draw the enemy area
-    if drawDebugOutlines then love.graphics.rectangle("line", d.enemy.x, d.enemy.y, d.enemy.w, d.enemy.h) end
-    if drawDebugOutlines then love.graphics.printf("Enemy area", d.enemy.x, d.enemy.y + 10, d.enemy.w, "center") end
-    cardDrawer:drawCardContainer(d.enemy, { 1 })
+    if DRAW_DEBUG_OUTLINES then love.graphics.rectangle("line", d.enemy.x, d.enemy.y, d.enemy.w, d.enemy.h) end
+    if DRAW_DEBUG_OUTLINES then love.graphics.printf("Enemy area", d.enemy.x, d.enemy.y + 10, d.enemy.w, "center") end
+    cardDrawer:drawCardContainer(d.enemy, { card, card })
 
     -- draw the player area
-    if drawDebugOutlines then love.graphics.rectangle("line", d.player.x, d.player.y, d.player.w, d.player.h) end
-    if drawDebugOutlines then love.graphics.printf("Player area", d.player.x, d.player.y + 10, d.player.w, "center") end
-    cardDrawer:drawCardContainer(d.player, { 1, 2, 3, 4, 5, 6, 7, 8 })
+    if DRAW_DEBUG_OUTLINES then love.graphics.rectangle("line", d.player.x, d.player.y, d.player.w, d.player.h) end
+    if DRAW_DEBUG_OUTLINES then love.graphics.printf("Player area", d.player.x, d.player.y + 10, d.player.w, "center") end
+    cardDrawer:drawCardContainer(d.player, { card, card, card, card, card })
 
     -- draw the hand card area
-    if drawDebugOutlines then love.graphics.rectangle("line", d.hand.x, d.hand.y, d.hand.w, d.hand.h) end
-    if drawDebugOutlines then love.graphics.printf("Hand cards", d.hand.x, d.hand.y + 10, d.hand.w, "center") end
+    if DRAW_DEBUG_OUTLINES then love.graphics.rectangle("line", d.hand.x, d.hand.y, d.hand.w, d.hand.h) end
+    if DRAW_DEBUG_OUTLINES then love.graphics.printf("Hand cards", d.hand.x, d.hand.y + 10, d.hand.w, "center") end
 
-    if drawDebugOutlines then
+    if DRAW_DEBUG_OUTLINES then
         love.graphics.line(love.graphics.getWidth() * 0.5, 0, love.graphics.getWidth() * 0.5, love.graphics.getHeight())
     end
 end

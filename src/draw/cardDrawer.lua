@@ -1,16 +1,16 @@
 
-local d = {}
+local cardDrawer = {}
 
 
 --- Draws all given cards into the specified container
 ---@return s the scaling used for the card
-function d:drawCardContainer(container, cardList)
+function cardDrawer:drawCardContainer(container, cardList)
     local s = 1 -- scale factor for card
     if #cardList > 0 then
         local maxW = container.w
         local maxH = container.h
-        local originalW = res.card.placeholder:getWidth()
-        local originalH = res.card.placeholder:getHeight()
+        local originalW = cardList[1]:getWidth()
+        local originalH = cardList[1]:getHeight()
         local pad = container.pad -- might be necessary to use a separate padding
 
         -- at least one card must fit into the container, so scale down card as long as necessary
@@ -46,7 +46,7 @@ function d:drawCardContainer(container, cardList)
         local yLoc = math.floor(container.y + maxH * 0.5)
 
         -- just draw all cards from left to right
-        for i, _ in ipairs(cardList) do
+        for i, card in ipairs(cardList) do
 
             -- start from leftmost location and add width and padding for each additional card
             local x = xLoc + (i - 1) * (w + pad)
@@ -56,11 +56,10 @@ function d:drawCardContainer(container, cardList)
                 x = x + xShift * (1 - ((i - 1) / (#cardList - 1)) * 2)
             end
 
-            love.graphics.draw(res.card.placeholder, x,
-                    yLoc, 0, s, s, math.floor(originalW * 0.5), math.floor(originalH * 0.5))
+            card:draw(x, yLoc, s)
 
             -- draw a red dot to each card's draw position
-            if drawDebugOutlines then
+            if DRAW_DEBUG_OUTLINES then
                 love.graphics.setColor(1.0, 0.0, 0.0)
                 love.graphics.rectangle("fill", x - 1, yLoc - 1, 3, 3)
                 love.graphics.setColor(1.0, 1.0, 1.0)
@@ -78,7 +77,7 @@ end
 
 
 --- Draw the specified text into the given container
-function d:drawTextContainer(container, text, scale)
+function cardDrawer:drawTextContainer(container, text, scale)
 
     -- match the font size to the used scaling
     local font = r.font.pixel
@@ -103,4 +102,4 @@ function d:drawTextContainer(container, text, scale)
 end
 
 
-return d
+return cardDrawer

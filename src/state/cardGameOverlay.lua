@@ -51,24 +51,25 @@ end
 --- Draw all card containers including their cards
 function cardGameOverlay:draw()
 
+    -- TODO set this card in a global game state container
+    local card = Card(cards.placeholder)
+
     -- draw the card container
-    if drawDebugOutlines then love.graphics.rectangle("line", d.card.x, d.card.y, d.card.w, d.card.h) end
-    if drawDebugOutlines then love.graphics.printf("Card area", d.card.x, d.card.y + 10, d.card.w, "center") end
-    local scale = cardDrawer:drawCardContainer(d.card, { 1 })
+    if DRAW_DEBUG_OUTLINES then love.graphics.rectangle("line", d.card.x, d.card.y, d.card.w, d.card.h) end
+    if DRAW_DEBUG_OUTLINES then love.graphics.printf("Card area", d.card.x, d.card.y + 10, d.card.w, "center") end
+    local scale = cardDrawer:drawCardContainer(d.card, { card })
 
     -- draw the left text box
-    if drawDebugOutlines then love.graphics.rectangle("line", d.leftText.x, d.leftText.y, d.leftText.w, d.leftText.h) end
-    if drawDebugOutlines then love.graphics.printf("Left text area", d.leftText.x, d.leftText.y + 10, d.leftText.w, "center") end
-    cardDrawer:drawTextContainer(d.leftText, "This is some formatted text for the left side", scale)
-
+    if DRAW_DEBUG_OUTLINES then love.graphics.rectangle("line", d.leftText.x, d.leftText.y, d.leftText.w, d.leftText.h) end
+    if DRAW_DEBUG_OUTLINES then love.graphics.printf("Left text area", d.leftText.x, d.leftText.y + 10, d.leftText.w, "center") end
+    cardDrawer:drawTextContainer(d.leftText, card:getLeftText(), scale)
 
     -- draw the right text box
-    local rText = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.\n\nAt vero eos et accusam et justo duo dolores et ea rebum."
-    if drawDebugOutlines then love.graphics.rectangle("line", d.rightText.x, d.rightText.y, d.rightText.w, d.rightText.h) end
-    if drawDebugOutlines then love.graphics.printf("Right text area", d.rightText.x, d.rightText.y + 10, d.rightText.w, "center") end
-    cardDrawer:drawTextContainer(d.rightText, rText, scale)
+    if DRAW_DEBUG_OUTLINES then love.graphics.rectangle("line", d.rightText.x, d.rightText.y, d.rightText.w, d.rightText.h) end
+    if DRAW_DEBUG_OUTLINES then love.graphics.printf("Right text area", d.rightText.x, d.rightText.y + 10, d.rightText.w, "center") end
+    cardDrawer:drawTextContainer(d.rightText, card:getRightText(), scale)
 
-    if drawDebugOutlines then
+    if DRAW_DEBUG_OUTLINES then
         love.graphics.line(0, love.graphics.getHeight() * 0.5, love.graphics.getWidth(), love.graphics.getHeight() * 0.5)
     end
 end

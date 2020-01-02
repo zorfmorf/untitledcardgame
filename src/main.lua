@@ -1,12 +1,13 @@
 
---- draw debug information in screens. TODO move to config file
-drawDebugOutlines = false
-
-res = {}
+-- util
+require "util.util"
+log = require "util.log"
+require "util.constants" -- needs to be loaded after log
 
 -- libraries
-GameState = require "hump.gamestate"
-
+Camera = require "hump.camera"
+Class = require "hump.class"
+GameState = require "hump.gameState"
 
 -- helper tools
 love.graphics.setDefaultFilter( "nearest", "nearest" )
@@ -17,13 +18,18 @@ cardDrawer = require "draw.cardDrawer"
 local state_card_game = require "state.cardGame"
 local state_card_game_overlay = require "state.cardGameOverlay"
 
+-- game
+cards = require "res.card"
+
+-- classes
+require "class.card"
 
 function love.load()
-    if arg[#arg] == "-debug" then require("mobdebug.mobdebug").start() end
+    if arg[#arg] == "-debug" then require("mobDebug.mobDebug").start() end
 
     GameState.registerEvents()
-    --GameState.switch(state_card_game)
-    GameState.switch(state_card_game_overlay)
+    GameState.switch(state_card_game)
+    --GameState.switch(state_card_game_overlay)
 
 end
 
