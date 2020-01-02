@@ -53,16 +53,6 @@ end
 --- Called when entering the state
 function cardGame:enter()
     self:resize()
-
-    -- TODO set this card in a global game state container
-    self.cardsEnemy = {}
-    for i=1,2 do
-        self.cardsEnemy[i] = Card(cards.placeholder)
-    end
-    self.cardsPlayer = {}
-    for i=1,5 do
-        self.cardsPlayer[i] = Card(cards.placeholder)
-    end
 end
 
 
@@ -75,9 +65,8 @@ end
 --- Called on every game update cycle
 ---@param dt number time since last update in seconds
 function cardGame:update(dt)
-    -- TODO get card lists from state
-    cardDrawer:updateCardDrawPositions(dt, d.enemy, self.cardsEnemy )
-    cardDrawer:updateCardDrawPositions(dt, d.player, self.cardsPlayer )
+    cardDrawer:updateCardDrawPositions(dt, d.enemy, globalCardState.enemyArea )
+    cardDrawer:updateCardDrawPositions(dt, d.player, globalCardState.playerArea )
 end
 
 
@@ -88,16 +77,31 @@ function cardGame:draw()
     cardDrawer:drawCardContainer(d.top, {})
 
     -- draw the enemy area
-    cardDrawer:drawCardContainer(d.enemy, self.cardsEnemy)
+    cardDrawer:drawCardContainer(d.enemy, globalCardState.enemyArea)
 
     -- draw the player area
-    cardDrawer:drawCardContainer(d.player, self.cardsPlayer)
+    cardDrawer:drawCardContainer(d.player, globalCardState.playerArea)
 
     -- draw the hand card area
     cardDrawer:drawCardContainer(d.hand, {})
 
     if DRAW_DEBUG_OUTLINES then
         love.graphics.line(love.graphics.getWidth() * 0.5, 0, love.graphics.getWidth() * 0.5, love.graphics.getHeight())
+    end
+end
+
+
+function cardGame:mousepressed(x, y, button, isTouch, presses)
+    if button == 1 then
+        local result = cardDrawer:catchMouseClick(d.enemy, x, y, globalCardState.enemyArea)
+        if not result then
+            result = cardDrawer:catchMouseClick(d.player, x, y, globalCardState.playerArea)
+        end
+        if result then
+            globalCardState.overlay = result
+            log:debug("Entering overlay game state")
+            GameState.push(state_card_game_overlay)
+        end
     end
 end
 

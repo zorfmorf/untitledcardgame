@@ -130,4 +130,24 @@ function cardDrawer:drawTextContainer(container, text, scale)
 end
 
 
+local function isInContainer(container, x, y)
+    return x >= container.x and x <= container.x + container.w and
+            y >= container.y and y <= container.y + container.h
+end
+
+
+function cardDrawer:catchMouseClick(container, x, y, cards)
+    if isInContainer(container, x, y) then
+        -- iterate in reverse so we correctly match overlapping cards
+        for i = #cards, 1, -1 do
+            card = cards[i]
+            if card:collides(container.id, x, y) then
+                return card
+            end
+        end
+    end
+    return nil
+end
+
+
 return cardDrawer

@@ -62,15 +62,12 @@ end
 --- Called on every game update cycle
 ---@param dt number time since last update in seconds
 function cardGameOverlay:update(dt)
-    -- TODO get card list from state
-    cardDrawer:updateCardDrawPositions(dt, d.card, { self.card })
+    cardDrawer:updateCardDrawPositions(dt, d.card, { globalCardState.overlay })
 end
 
 
 --- Draw all card containers including their cards
 function cardGameOverlay:draw()
-
-    local card = self.card -- TODO get this from game state
 
     -- draw the card container
     cardDrawer:drawCardContainer(d.card, { card })
@@ -82,6 +79,17 @@ function cardGameOverlay:draw()
     if DRAW_DEBUG_OUTLINES then
         -- horizontal line in center to better see alignment
         love.graphics.line(0, love.graphics.getHeight() * 0.5, love.graphics.getWidth(), love.graphics.getHeight() * 0.5)
+    end
+end
+
+
+function cardGameOverlay:mousepressed(x, y, button, isTouch, presses)
+    if button == 1 then
+        if not cardDrawer:catchMouseClick(d.card, x, y, { globalCardState.overlay }) then
+            globalCardState.overlay = false
+            log:debug("Leaving overlay game state")
+            GameState.pop()
+        end
     end
 end
 

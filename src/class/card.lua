@@ -79,3 +79,11 @@ end
 function Card:getScale(id)
     return self.drawPos[id].scale
 end
+
+
+function Card:collides(id, x, y)
+    local t = self.drawPos[id]
+    local w = self:getWidth() * t.scale * 0.5
+    local h = self:getHeight() * t.scale * 0.5
+    return x >= t.x - w and x <= t.x + w and y >= t.y - h and y <= t.y + h
+end

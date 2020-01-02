@@ -15,10 +15,12 @@ res = require "draw.resourceLoader" -- load after scaling filter has been set
 cardDrawer = require "draw.cardDrawer"
 
 -- states
-local state_card_game = require "state.cardGame"
-local state_card_game_overlay = require "state.cardGameOverlay"
+state_card_game = require "state.cardGame"
+state_card_game_overlay = require "state.cardGameOverlay"
 
 -- game
+globalCardState = require "game.globalCardState"
+ruler = require "game.ruler"
 cards = require "res.card"
 
 -- classes
@@ -28,8 +30,9 @@ function love.load()
     if arg[#arg] == "-debug" then require("mobDebug.mobDebug").start() end
 
     GameState.registerEvents()
-    --GameState.switch(state_card_game)
-    GameState.switch(state_card_game_overlay)
+
+    ruler:init()
+    GameState.switch(state_card_game)
 
 end
 
