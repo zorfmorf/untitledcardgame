@@ -47,9 +47,6 @@ end
 --- Called when entering the state
 function cardGameOverlay:enter()
     self:resize()
-
-    -- TODO set this card in a global game state container
-    self.card = Card(cards.placeholder)
 end
 
 
@@ -86,11 +83,16 @@ end
 function cardGameOverlay:mousepressed(x, y, button, isTouch, presses)
     if button == 1 then
         if not cardDrawer:catchMouseClick(d.card, x, y, { globalCardState.overlay }) then
-            globalCardState.overlay = false
-            log:debug("Leaving overlay game state")
             GameState.pop()
         end
     end
+end
+
+
+function cardGameOverlay:leave()
+    log:debug("Leaving overlay game state")
+    globalCardState.overlay.drawPos[d.id] = nil -- TODO probably should do this through a method
+    globalCardState.overlay = nil
 end
 
 

@@ -67,6 +67,16 @@ end
 function cardGame:update(dt)
     cardDrawer:updateCardDrawPositions(dt, d.enemy, globalCardState.enemyArea )
     cardDrawer:updateCardDrawPositions(dt, d.player, globalCardState.playerArea )
+
+    local x, y = love.mouse.getPosition()
+    for _, card in ipairs(globalCardState.enemyArea) do
+        card:checkMouseOver(x, y)
+        card:update(dt)
+    end
+    for _, card in ipairs(globalCardState.playerArea) do
+        card:checkMouseOver(x, y)
+        card:update(dt)
+    end
 end
 
 
