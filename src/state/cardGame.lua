@@ -69,12 +69,29 @@ function cardGame:update(dt)
     cardDrawer:updateCardDrawPositions(dt, d.player, globalCardState.playerArea )
 
     local x, y = love.mouse.getPosition()
-    for _, card in ipairs(globalCardState.enemyArea) do
-        card:checkMouseOver(x, y)
+
+    -- TODO refactor the following section to get this shit out of the cardGame update section
+    -- I see duplicate code and a lot of animation related caught that ought to be in the card
+    -- iterate in reverse so mouseover detection works correctly on overlapping cards
+    local mouseCaught = false
+    for i = #globalCardState.enemyArea, 1, -1 do
+        local card = globalCardState.enemyArea[i]
+        if mouseCaught then
+            card.animState.mouseover.increase = false
+        else
+            mouseCaught = card:checkMouseOver(x, y)
+        end
         card:update(dt)
     end
-    for _, card in ipairs(globalCardState.playerArea) do
-        card:checkMouseOver(x, y)
+
+    mouseCaught = false
+    for i = #globalCardState.playerArea, 1, -1 do
+        local card = globalCardState.playerArea[i]
+        if mouseCaught then
+            card.animState.mouseover.increase = false
+        else
+            mouseCaught = card:checkMouseOver(x, y)
+        end
         card:update(dt)
     end
 end

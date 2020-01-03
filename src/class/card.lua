@@ -12,7 +12,7 @@ Card = Class {
         self.img = res.card[self.data.img]
         self.drawPos = {} -- container to save draw positions into
         self.animState = {
-            mouseover = { incease = false, dt = 0.0 },
+            mouseover = { increase = false, dt = 0.0 },
             r = 0
         }
         if not self.img then log:err("Could not locate card image resource", self.data.img) end
@@ -43,6 +43,7 @@ function Card:checkMouseOver(x, y)
             self.animState.mouseover.increase = true
         end
     end
+    return self.animState.mouseover.increase
 end
 
 
@@ -56,9 +57,10 @@ end
 
 function Card:draw(id)
     love.graphics.setColor(1.0, 1.0, 1.0)
+    local dt = self.animState.mouseover.dt
     local d = self.drawPos[id]
-    local s = d.scale * (1 + self.animState.mouseover.dt * 0.1) -- increase size on mouse over
-    love.graphics.draw(self.img, d.x, d.y, self.animState.r, s, s,
+    local s = d.scale * (1 + dt * 0.05) -- increase size on mouse over
+    love.graphics.draw(self.img, d.x, math.floor(d.y - dt * 10), self.animState.r, s, s,
             math.floor(self:getWidth() * 0.5), math.floor(self:getHeight() * 0.5))
 end
 
