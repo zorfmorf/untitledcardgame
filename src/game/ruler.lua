@@ -7,14 +7,17 @@ ruler = {}
 
 function ruler:init()
 
-    self.cardsEnemy = {}
     for i=1,2 do
         globalCardState.enemyArea[i] = Card(cards.placeholder)
     end
-    self.cardsPlayer = {}
     for i=1,5 do
         globalCardState.playerArea[i] = Card(cards.placeholder)
     end
+    globalCardState.playerCemetery[1] = Card(cards.placeholder)
+    for i=1,5 do
+        globalCardState.playerHand[i] = Card(cards.placeholder)
+    end
+    globalCardState.playerStack[1] = Card(cards.placeholder)
 
 end
 

@@ -18,7 +18,7 @@ local function recalculateDimensions()
         x = d.pad,
         y = 0,
         w = math.floor(width - d.pad * 2),
-        h = math.floor(height* 0.1)
+        h = math.floor(height* 0.05)
     }
     d.enemy = {
         id = d.id,
@@ -38,14 +38,34 @@ local function recalculateDimensions()
         w = math.floor(width - d.pad * 2),
         h = math.floor(height * 0.3)
     }
+
+    local stackWidth = math.floor(width  * 0.2)
+    d.stack = {
+        id = d.id,
+        name = "Stack",
+        pad = d.pad,
+        x = d.pad,
+        y = d.pad + d.player.y + d.player.h,
+        w = stackWidth,
+        h = math.floor(height * 0.3)
+    }
     d.hand = {
         id = d.id,
         name = "Player hand card area",
         pad = d.pad,
-        x = d.pad,
+        x = d.pad + stackWidth + d.pad,
         y = d.pad + d.player.y + d.player.h,
-        w = math.floor(width - d.pad * 2),
-        h = math.floor(height * 0.24)
+        w = math.floor(width - stackWidth * 2 - d.pad * 4),
+        h = math.floor(height * 0.3)
+    }
+    d.cemetery = {
+        id = d.id,
+        name = "Cemetery",
+        pad = d.pad,
+        x = width - d.pad - stackWidth,
+        y = d.pad + d.player.y + d.player.h,
+        w = stackWidth,
+        h = math.floor(height * 0.3)
     }
 end
 
@@ -65,28 +85,31 @@ end
 --- Called on every game update cycle
 ---@param dt number time since last update in seconds
 function cardGame:update(dt)
+    -- TODO refactor this
     cardDrawer:updateCardDrawPositions(dt, d.enemy, globalCardState.enemyArea )
     cardDrawer:updateCardDrawPositions(dt, d.player, globalCardState.playerArea )
+    cardDrawer:updateCardDrawPositions(dt, d.hand, globalCardState.playerHand )
+    cardDrawer:updateCardDrawPositions(dt, d.stack, globalCardState.playerStack )
+    cardDrawer:updateCardDrawPositions(dt, d.cemetery, globalCardState.playerCemetery )
 
     cardDrawer:updateMouseOver(dt, globalCardState.enemyArea)
     cardDrawer:updateMouseOver(dt, globalCardState.playerArea)
+    cardDrawer:updateMouseOver(dt, globalCardState.playerHand)
+    cardDrawer:updateMouseOver(dt, globalCardState.playerStack)
+    cardDrawer:updateMouseOver(dt, globalCardState.playerCemetery)
 end
 
 
 --- Draw all card containers including their cards
 function cardGame:draw()
 
-    -- draw the top bar
+    -- TODO refactor this
     cardDrawer:drawCardContainer(d.top, {})
-
-    -- draw the enemy area
     cardDrawer:drawCardContainer(d.enemy, globalCardState.enemyArea)
-
-    -- draw the player area
     cardDrawer:drawCardContainer(d.player, globalCardState.playerArea)
-
-    -- draw the hand card area
-    cardDrawer:drawCardContainer(d.hand, {})
+    cardDrawer:drawCardContainer(d.hand, globalCardState.playerHand)
+    cardDrawer:drawCardContainer(d.stack, globalCardState.playerStack)
+    cardDrawer:drawCardContainer(d.cemetery, globalCardState.playerCemetery)
 
     if DRAW_DEBUG_OUTLINES then
         love.graphics.line(love.graphics.getWidth() * 0.5, 0, love.graphics.getWidth() * 0.5, love.graphics.getHeight())
@@ -96,6 +119,7 @@ end
 
 function cardGame:mousepressed(x, y, button, isTouch, presses)
     if button == 1 then
+        -- TODO refactor this and include other card containers
         local result = cardDrawer:catchMouseClick(d.enemy, x, y, globalCardState.enemyArea)
         if not result then
             result = cardDrawer:catchMouseClick(d.player, x, y, globalCardState.playerArea)
