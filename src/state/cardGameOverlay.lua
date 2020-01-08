@@ -66,11 +66,11 @@ end
 --- Draw all card containers including their cards
 function cardGameOverlay:draw()
 
+    local card = globalCardState.overlay
+
     -- draw the card container
     cardDrawer:drawCardContainer(d.card, { card })
-
     cardDrawer:drawTextContainer(d.leftText, card:getLeftText(), card:getScale(d.id))
-
     cardDrawer:drawTextContainer(d.rightText, card:getRightText(), card:getScale(d.id))
 
     if DRAW_DEBUG_OUTLINES then

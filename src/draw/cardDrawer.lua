@@ -70,6 +70,7 @@ function cardDrawer:updateCardDrawPositions(dt, container, cardList)
     return s
 end
 
+
 --- Draws all given cards into the specified container
 ---@return number the scaling used for the card
 function cardDrawer:drawCardContainer(container, cardList)
@@ -136,17 +137,35 @@ local function isInContainer(container, x, y)
 end
 
 
+--- See if the mouse click is hitting any of the cards in the given container.
+---@return table the card that caught the click or nil
 function cardDrawer:catchMouseClick(container, x, y, cards)
     if isInContainer(container, x, y) then
-        -- iterate in reverse so we correctly match overlapping cards
+        -- iterate in reverse so we correctly match overlapping cards (topmost first)
         for i = #cards, 1, -1 do
-            card = cards[i]
-            if card:collides(container.id, x, y) then
-                return card
+            if cards[i]:collides(container.id, x, y) then
+                return cards[i]
             end
         end
     end
     return nil
+end
+
+
+function cardDrawer:updateMouseOver(dt, cards)
+    local mouseCaught = false
+    local x, y = love.mouse.getPosition()
+
+    -- iterate in reverse so mouseover detection works correctly on overlapping cards
+    for i = #cards, 1, -1 do
+        local card = cards[i]
+        if mouseCaught then
+            card.animState.mouseover.increase = false
+        else
+            mouseCaught = card:checkMouseOver(x, y)
+        end
+        card:update(dt)
+    end
 end
 
 

@@ -55,11 +55,12 @@ function Card:update(dt)
     end
 end
 
+
 function Card:draw(id)
     love.graphics.setColor(1.0, 1.0, 1.0)
     local dt = self.animState.mouseover.dt
     local d = self.drawPos[id]
-    local s = d.scale * (1 + dt * 0.05) -- increase size on mouse over
+    local s = self:getDrawScale(id) -- increase size on mouse over
     love.graphics.draw(self.img, d.x, math.floor(d.y - dt * 10), self.animState.r, s, s,
             math.floor(self:getWidth() * 0.5), math.floor(self:getHeight() * 0.5))
 end
@@ -97,14 +98,25 @@ function Card:getY(id)
 end
 
 
+--- Return the current card scale used for the given container id
+---@param id number Container id to calculate the scale for
 function Card:getScale(id)
     return self.drawPos[id].scale
 end
 
 
+--- Return the current card scale used for the given container id when drawing the card (modified from regular scale)
+---@param id number Container id to calculate the scale for
+function Card:getDrawScale(id)
+    return self:getScale(id) * (1 + self.animState.mouseover.dt * 0.05)
+end
+
+
+--- Check if the given mouse position collides with the card position for the assigned container id
+---@return boolean collision or not
 function Card:collides(id, x, y)
     local t = self.drawPos[id]
-    local w = self:getWidth() * t.scale * 0.5
-    local h = self:getHeight() * t.scale * 0.5
+    local w = self:getWidth() * self:getDrawScale(id) * 0.5
+    local h = self:getHeight() * self:getDrawScale(id) * 0.5
     return x >= t.x - w and x <= t.x + w and y >= t.y - h and y <= t.y + h
 end
