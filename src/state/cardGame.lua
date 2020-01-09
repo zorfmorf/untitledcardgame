@@ -85,25 +85,17 @@ end
 --- Called on every game update cycle
 ---@param dt number time since last update in seconds
 function cardGame:update(dt)
-    -- TODO refactor this
-    cardDrawer:updateCardDrawPositions(dt, d.enemy, globalCardState.enemyArea )
-    cardDrawer:updateCardDrawPositions(dt, d.player, globalCardState.playerArea )
-    cardDrawer:updateCardDrawPositions(dt, d.hand, globalCardState.playerHand )
-    cardDrawer:updateCardDrawPositions(dt, d.stack, globalCardState.playerStack )
-    cardDrawer:updateCardDrawPositions(dt, d.cemetery, globalCardState.playerCemetery )
-
-    cardDrawer:updateMouseOver(dt, globalCardState.enemyArea)
-    cardDrawer:updateMouseOver(dt, globalCardState.playerArea)
-    cardDrawer:updateMouseOver(dt, globalCardState.playerHand)
-    cardDrawer:updateMouseOver(dt, globalCardState.playerStack)
-    cardDrawer:updateMouseOver(dt, globalCardState.playerCemetery)
+    cardDrawer:update(dt, d.enemy, globalCardState.enemyArea )
+    cardDrawer:update(dt, d.player, globalCardState.playerArea )
+    cardDrawer:update(dt, d.hand, globalCardState.playerHand )
+    cardDrawer:update(dt, d.stack, globalCardState.playerStack )
+    cardDrawer:update(dt, d.cemetery, globalCardState.playerCemetery )
 end
 
 
 --- Draw all card containers including their cards
 function cardGame:draw()
 
-    -- TODO refactor this
     cardDrawer:drawCardContainer(d.top, {})
     cardDrawer:drawCardContainer(d.enemy, globalCardState.enemyArea)
     cardDrawer:drawCardContainer(d.player, globalCardState.playerArea)
@@ -119,10 +111,18 @@ end
 
 function cardGame:mousepressed(x, y, button, isTouch, presses)
     if button == 1 then
-        -- TODO refactor this and include other card containers
         local result = cardDrawer:catchMouseClick(d.enemy, x, y, globalCardState.enemyArea)
         if not result then
             result = cardDrawer:catchMouseClick(d.player, x, y, globalCardState.playerArea)
+        end
+        if not result then
+            result = cardDrawer:catchMouseClick(d.hand, x, y, globalCardState.playerHand)
+        end
+        if not result then
+            result = cardDrawer:catchMouseClick(d.stack, x, y, globalCardState.playerStack)
+        end
+        if not result then
+            result = cardDrawer:catchMouseClick(d.cemetery, x, y, globalCardState.playerCemetery)
         end
         if result then
             globalCardState.overlay = result

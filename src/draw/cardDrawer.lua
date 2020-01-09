@@ -152,6 +152,12 @@ function cardDrawer:catchMouseClick(container, x, y, cards)
 end
 
 
+function cardDrawer:update(dt, container, cards)
+    cardDrawer:updateCardDrawPositions(dt, container.enemy, cards)
+    cardDrawer:updateMouseOver(dt, cards)
+end
+
+
 function cardDrawer:updateMouseOver(dt, cards)
     local mouseCaught = false
     local x, y = love.mouse.getPosition()
