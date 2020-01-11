@@ -8,17 +8,17 @@ local cardDrawer = {}
 ---@param container table a container with dimensions to draw the cards into
 ---@param cardList table the list of cards to be drawn
 ---@return number the scaling used
-function cardDrawer:updateCardDrawPositions(dt, container, cardList)
+function cardDrawer:updateCardDrawPositions(dt, container)
 
     local s = 1 -- scale factor for card
 
     -- nothing to be done if there are no cards
-    if #cardList == 0 then return s end
+    if #container:getCards() == 0 then return s end
 
     local maxW = container.w
     local maxH = container.h
-    local originalW = cardList[1]:getWidth()
-    local originalH = cardList[1]:getHeight()
+    local originalW = container:getCards()[1]:getWidth()
+    local originalH = container:getCards()[1]:getHeight()
     local pad = container.pad -- might be necessary to use a separate padding
 
     -- at least one card must fit into the container, so scale down card as long as necessary
@@ -38,7 +38,7 @@ function cardDrawer:updateCardDrawPositions(dt, container, cardList)
     local h = math.floor(originalH * s)
 
     local xCenterOfContainer = container.x + maxW * 0.5
-    local widthOfAllCards = #cardList * w + (#cardList - 1) * pad
+    local widthOfAllCards = #container:getCards()  * w + (#container:getCards()  - 1) * pad
 
     -- the x location of the leftmost card to draw (center of card)
     local xLoc = math.floor( xCenterOfContainer - 0.5 * (widthOfAllCards - w))
@@ -54,14 +54,14 @@ function cardDrawer:updateCardDrawPositions(dt, container, cardList)
     local yLoc = math.floor(container.y + maxH * 0.5)
 
     -- just draw all cards from left to right
-    for i, card in ipairs(cardList) do
+    for i, card in ipairs(container:getCards() ) do
 
         -- start from leftmost location and add width and padding for each additional card
         local x = xLoc + (i - 1) * (w + pad)
 
         -- xShift moves cards further to the center. the further away from the center, the more xShift is applied
-        if #cardList > 1 then
-            x = x + xShift * (1 - ((i - 1) / (#cardList - 1)) * 2)
+        if #container:getCards() > 1 then
+            x = x + xShift * (1 - ((i - 1) / (#container:getCards() - 1)) * 2)
         end
 
         card:setDrawPosition(container.id, x, yLoc, s)
@@ -73,10 +73,10 @@ end
 
 --- Draws all given cards into the specified container
 ---@return number the scaling used for the card
-function cardDrawer:drawCardContainer(container, cardList)
+function cardDrawer:drawCardContainer(container)
 
     -- just draw all cards from left to right
-    for _, card in ipairs(cardList) do
+    for _, card in ipairs(container:getCards()) do
 
         card:draw(container.id)
 
@@ -139,12 +139,12 @@ end
 
 --- See if the mouse click is hitting any of the cards in the given container.
 ---@return table the card that caught the click or nil
-function cardDrawer:catchMouseClick(container, x, y, cards)
+function cardDrawer:catchMouseClick(container, x, y)
     if isInContainer(container, x, y) then
         -- iterate in reverse so we correctly match overlapping cards (topmost first)
-        for i = #cards, 1, -1 do
-            if cards[i]:collides(container.id, x, y) then
-                return cards[i]
+        for i = #container:getCards(), 1, -1 do
+            if container:getCards()[i]:collides(container.id, x, y) then
+                return container:getCards()[i]
             end
         end
     end
@@ -152,9 +152,9 @@ function cardDrawer:catchMouseClick(container, x, y, cards)
 end
 
 
-function cardDrawer:update(dt, container, cards)
-    cardDrawer:updateCardDrawPositions(dt, container.enemy, cards)
-    cardDrawer:updateMouseOver(dt, cards)
+function cardDrawer:update(dt, container)
+    self:updateCardDrawPositions(dt, container)
+    self:updateMouseOver(dt, container:getCards())
 end
 
 

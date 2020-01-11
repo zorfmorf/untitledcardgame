@@ -7,11 +7,12 @@ local d = {
 }
 
 --- recalculate the dimensions of all card game areas depending on the current game window dimensions
-local function recalculateDimensions()
+function cardGame:recalculateDimensions()
     local height = love.graphics.getHeight()
     local width = love.graphics.getWidth()
     d.pad = math.floor(height * 0.02)
-    d.top = {
+
+    self.containers.top:updateDimensions({
         id = d.id,
         name = "Top bar",
         pad = d.pad,
@@ -19,60 +20,69 @@ local function recalculateDimensions()
         y = 0,
         w = math.floor(width - d.pad * 2),
         h = math.floor(height* 0.05)
-    }
-    d.enemy = {
+    })
+    self.containers.enemy:updateDimensions({
         id = d.id,
         name = "Enemy card area",
         pad = d.pad,
         x = d.pad,
-        y = d.pad + d.top.y + d.top.h,
+        y = d.pad + self.containers.top.y + self.containers.top.h,
         w = math.floor(width - d.pad * 2),
         h = math.floor(height * 0.3)
-    }
-    d.player = {
+    })
+    self.containers.player:updateDimensions({
         id = d.id,
         name = "Player card area",
         pad = d.pad,
         x = d.pad,
-        y = d.pad + d.enemy.y + d.enemy.h,
+        y = d.pad + self.containers.enemy.y + self.containers.enemy.h,
         w = math.floor(width - d.pad * 2),
         h = math.floor(height * 0.3)
-    }
+    })
 
     local stackWidth = math.floor(width  * 0.2)
-    d.stack = {
+    self.containers.stack:updateDimensions({
         id = d.id,
         name = "Stack",
         pad = d.pad,
         x = d.pad,
-        y = d.pad + d.player.y + d.player.h,
+        y = d.pad + self.containers.player.y + self.containers.player.h,
         w = stackWidth,
         h = math.floor(height * 0.3)
-    }
-    d.hand = {
+    })
+    self.containers.hand:updateDimensions({
         id = d.id,
         name = "Player hand card area",
         pad = d.pad,
         x = d.pad + stackWidth + d.pad,
-        y = d.pad + d.player.y + d.player.h,
+        y = d.pad + self.containers.player.y + self.containers.player.h,
         w = math.floor(width - stackWidth * 2 - d.pad * 4),
         h = math.floor(height * 0.3)
-    }
-    d.cemetery = {
+    })
+    self.containers.cemetery:updateDimensions({
         id = d.id,
         name = "Cemetery",
         pad = d.pad,
         x = width - d.pad - stackWidth,
-        y = d.pad + d.player.y + d.player.h,
+        y = d.pad + self.containers.player.y + self.containers.player.h,
         w = stackWidth,
         h = math.floor(height * 0.3)
-    }
+    })
 end
 
 
 --- Called when entering the state
 function cardGame:enter()
-    self:resize()
+
+    self.containers = {}
+    self.containers.top = Container({})
+    self.containers.enemy = Container(globalCardState.enemyArea)
+    self.containers.player = Container(globalCardState.playerArea)
+    self.containers.hand = Container(globalCardState.playerHand)
+    self.containers.stack = Container(globalCardState.playerStack)
+    self.containers.cemetery = Container(globalCardState.playerCemetery)
+
+    self:recalculateDimensions()
 end
 
 
@@ -85,23 +95,18 @@ end
 --- Called on every game update cycle
 ---@param dt number time since last update in seconds
 function cardGame:update(dt)
-    cardDrawer:update(dt, d.enemy, globalCardState.enemyArea )
-    cardDrawer:update(dt, d.player, globalCardState.playerArea )
-    cardDrawer:update(dt, d.hand, globalCardState.playerHand )
-    cardDrawer:update(dt, d.stack, globalCardState.playerStack )
-    cardDrawer:update(dt, d.cemetery, globalCardState.playerCemetery )
+    for _, container in pairs(self.containers) do
+        cardDrawer:update(dt, container)
+    end
 end
 
 
 --- Draw all card containers including their cards
 function cardGame:draw()
 
-    cardDrawer:drawCardContainer(d.top, {})
-    cardDrawer:drawCardContainer(d.enemy, globalCardState.enemyArea)
-    cardDrawer:drawCardContainer(d.player, globalCardState.playerArea)
-    cardDrawer:drawCardContainer(d.hand, globalCardState.playerHand)
-    cardDrawer:drawCardContainer(d.stack, globalCardState.playerStack)
-    cardDrawer:drawCardContainer(d.cemetery, globalCardState.playerCemetery)
+    for _, container in pairs(self.containers) do
+        cardDrawer:drawCardContainer(container)
+    end
 
     if DRAW_DEBUG_OUTLINES then
         love.graphics.line(love.graphics.getWidth() * 0.5, 0, love.graphics.getWidth() * 0.5, love.graphics.getHeight())
@@ -111,19 +116,13 @@ end
 
 function cardGame:mousepressed(x, y, button, isTouch, presses)
     if button == 1 then
-        local result = cardDrawer:catchMouseClick(d.enemy, x, y, globalCardState.enemyArea)
-        if not result then
-            result = cardDrawer:catchMouseClick(d.player, x, y, globalCardState.playerArea)
+
+        local result = false
+        for _, container in pairs(self.containers) do
+            result = cardDrawer:catchMouseClick(container, x, y)
+            if result then break end
         end
-        if not result then
-            result = cardDrawer:catchMouseClick(d.hand, x, y, globalCardState.playerHand)
-        end
-        if not result then
-            result = cardDrawer:catchMouseClick(d.stack, x, y, globalCardState.playerStack)
-        end
-        if not result then
-            result = cardDrawer:catchMouseClick(d.cemetery, x, y, globalCardState.playerCemetery)
-        end
+
         if result then
             globalCardState.overlay = result
             log:debug("Entering overlay game state")

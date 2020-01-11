@@ -21,7 +21,8 @@ local function recalculateDimensions()
         x = d.pad,
         y = d.pad,
         w = thirdWidth,
-        h = math.floor(height * 0.96)
+        h = math.floor(height * 0.96),
+        getCards = function() return { } end -- little bit of a dirt hack but I can't be arsed to refactor this again
     }
     d.card = {
         id = d.id,
@@ -30,7 +31,8 @@ local function recalculateDimensions()
         x = d.pad * 2 + thirdWidth,
         y = d.pad,
         w = thirdWidth,
-        h = math.floor(height * 0.96)
+        h = math.floor(height * 0.96),
+        getCards = function() return { globalCardState.overlay } end -- see above
     }
     d.rightText = {
         id = d.id,
@@ -39,7 +41,8 @@ local function recalculateDimensions()
         x = d.pad * 3 + 2 * thirdWidth,
         y = d.pad,
         w = thirdWidth,
-        h = math.floor(height * 0.96)
+        h = math.floor(height * 0.96),
+        getCards = function() return { } end -- see above
     }
 end
 
@@ -59,7 +62,7 @@ end
 --- Called on every game update cycle
 ---@param dt number time since last update in seconds
 function cardGameOverlay:update(dt)
-    cardDrawer:updateCardDrawPositions(dt, d.card, { globalCardState.overlay })
+    cardDrawer:updateCardDrawPositions(dt, d.card)
 end
 
 

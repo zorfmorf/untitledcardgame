@@ -25,6 +25,7 @@ cards = require "res.card"
 
 -- classes
 require "class.card"
+require "class.container"
 
 function love.load()
     if arg[#arg] == "-debug" then require("mobDebug.mobDebug").start() end
