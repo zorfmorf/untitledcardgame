@@ -73,8 +73,8 @@ end
 
 --- Called when entering the state
 function cardGame:enter()
-
     self.containers = {}
+
     self.containers.top = Container({})
     self.containers.enemy = Container(globalCardState.enemyArea)
     self.containers.player = Container(globalCardState.playerArea)
@@ -82,13 +82,13 @@ function cardGame:enter()
     self.containers.stack = Container(globalCardState.playerStack)
     self.containers.cemetery = Container(globalCardState.playerCemetery)
 
-    self:recalculateDimensions()
+    self:resize()
 end
 
 
 --- Called on window resize
 function cardGame:resize()
-    recalculateDimensions()
+    self:recalculateDimensions()
 end
 
 
@@ -96,7 +96,7 @@ end
 ---@param dt number time since last update in seconds
 function cardGame:update(dt)
     for _, container in pairs(self.containers) do
-        cardDrawer:update(dt, container)
+        container:update(dt)
     end
 end
 
@@ -105,7 +105,7 @@ end
 function cardGame:draw()
 
     for _, container in pairs(self.containers) do
-        cardDrawer:drawCardContainer(container)
+        container:draw()
     end
 
     if DRAW_DEBUG_OUTLINES then
@@ -119,7 +119,7 @@ function cardGame:mousepressed(x, y, button, isTouch, presses)
 
         local result = false
         for _, container in pairs(self.containers) do
-            result = cardDrawer:catchMouseClick(container, x, y)
+            result = container:catchMouseClick(x, y)
             if result then break end
         end
 
@@ -129,6 +129,11 @@ function cardGame:mousepressed(x, y, button, isTouch, presses)
             GameState.push(state_card_game_overlay)
         end
     end
+end
+
+
+function cardGame:resume()
+    self:recalculateDimensions()
 end
 
 

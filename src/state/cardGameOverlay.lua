@@ -7,74 +7,83 @@ local d = {
 }
 
 --- recalculate the dimensions of all card game areas depending on the current game window dimensions
-local function recalculateDimensions()
+function cardGameOverlay:recalculateDimensions()
     local height = love.graphics.getHeight()
     local width = love.graphics.getWidth()
     d.pad = math.floor(height * 0.02)
 
     -- split the width into three equal parts, with padding between all parts (and the screen border)
     local thirdWidth = math.floor((width - d.pad * 4) / 3)
-    d.leftText = {
+
+    self.containers.leftText:updateDimensions({
         id = d.id,
         name = "Left text area",
         pad = d.pad,
         x = d.pad,
         y = d.pad,
         w = thirdWidth,
-        h = math.floor(height * 0.96),
-        getCards = function() return { } end -- little bit of a dirt hack but I can't be arsed to refactor this again
-    }
-    d.card = {
+        h = math.floor(height * 0.96)
+    })
+
+    self.containers.card:updateDimensions({
         id = d.id,
         name = "Card area",
         pad = d.pad,
         x = d.pad * 2 + thirdWidth,
         y = d.pad,
         w = thirdWidth,
-        h = math.floor(height * 0.96),
-        getCards = function() return { globalCardState.overlay } end -- see above
-    }
-    d.rightText = {
+        h = math.floor(height * 0.96)
+    })
+
+    self.containers.rightText:updateDimensions({
         id = d.id,
         name = "Right text area",
         pad = d.pad,
         x = d.pad * 3 + 2 * thirdWidth,
         y = d.pad,
         w = thirdWidth,
-        h = math.floor(height * 0.96),
-        getCards = function() return { } end -- see above
-    }
+        h = math.floor(height * 0.96)
+    })
 end
 
 
 --- Called when entering the state
 function cardGameOverlay:enter()
+    self.containers = {}
+
+    self.containers.leftText = TextContainer(globalCardState.overlay:getLeftText())
+    self.containers.card = Container( { globalCardState.overlay } )
+    self.containers.rightText = TextContainer(globalCardState.overlay:getRightText())
+
     self:resize()
 end
 
 
 --- Called on window resize
 function cardGameOverlay:resize()
-    recalculateDimensions()
+    self:recalculateDimensions()
 end
 
 
 --- Called on every game update cycle
 ---@param dt number time since last update in seconds
 function cardGameOverlay:update(dt)
-    cardDrawer:updateCardDrawPositions(dt, d.card)
+    self.containers.card:update(dt)
+    local scale = self.containers.card:getCurrentCardScale()
+
+    self.containers.leftText.scale = scale
+    self.containers.leftText:update(dt)
+    self.containers.rightText.scale = scale
+    self.containers.rightText:update(dt)
 end
 
 
 --- Draw all card containers including their cards
 function cardGameOverlay:draw()
 
-    local card = globalCardState.overlay
-
-    -- draw the card container
-    cardDrawer:drawCardContainer(d.card, { card })
-    cardDrawer:drawTextContainer(d.leftText, card:getLeftText(), card:getScale(d.id))
-    cardDrawer:drawTextContainer(d.rightText, card:getRightText(), card:getScale(d.id))
+    for _, container in pairs(self.containers) do
+        container:draw()
+    end
 
     if DRAW_DEBUG_OUTLINES then
         -- horizontal line in center to better see alignment
@@ -85,7 +94,7 @@ end
 
 function cardGameOverlay:mousepressed(x, y, button, isTouch, presses)
     if button == 1 then
-        if not cardDrawer:catchMouseClick(d.card, x, y, { globalCardState.overlay }) then
+        if not self.containers.card:catchMouseClick(x, y) then
             GameState.pop()
         end
     end

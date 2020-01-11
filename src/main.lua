@@ -12,7 +12,6 @@ GameState = require "hump.gameState"
 -- helper tools
 love.graphics.setDefaultFilter( "nearest", "nearest" )
 res = require "draw.resourceLoader" -- load after scaling filter has been set
-cardDrawer = require "draw.cardDrawer"
 
 -- states
 state_card_game = require "state.cardGame"
@@ -26,6 +25,7 @@ cards = require "res.card"
 -- classes
 require "class.card"
 require "class.container"
+require "class.textContainer"
 
 function love.load()
     if arg[#arg] == "-debug" then require("mobDebug.mobDebug").start() end
