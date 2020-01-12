@@ -8,16 +8,16 @@ ruler = {}
 function ruler:init()
 
     for i=1,2 do
-        globalCardState.enemyArea[i] = Card(cards.placeholder)
+        globalCardState.enemyArea[i] = Card(cardData.placeholder)
     end
     for i=1,5 do
-        globalCardState.playerArea[i] = Card(cards.placeholder)
+        globalCardState.playerArea[i] = Card(cardData.placeholder)
     end
-    globalCardState.playerCemetery[1] = Card(cards.placeholder)
+    globalCardState.playerCemetery[1] = Card(cardData.placeholder)
     for i=1,5 do
-        globalCardState.playerHand[i] = Card(cards.placeholder)
+        globalCardState.playerHand[i] = Card(cardData.placeholder)
     end
-    globalCardState.playerStack[1] = Card(cards.placeholder)
+    globalCardState.playerStack[1] = Card(cardData.placeholder)
     globalCardState.playerStack[1]:flip()
 
 end

@@ -21,7 +21,7 @@ state_card_game_overlay = require "state.cardGameOverlay"
 globalCardState = require "game.globalCardState"
 ruler = require "game.ruler"
 hand = require "game.hand"
-cards = require "res.card"
+cardData = require "res.cardData"
 
 -- classes
 require "class.card"

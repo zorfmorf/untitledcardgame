@@ -1,11 +1,18 @@
 
+local ID = 0
+
+local function generateID()
+    ID = ID + 1
+    return ID
+end
+
 --- Represents one container that can display cards
 ---
 --- Extend for specific card features
 Container = Class {
 
     init = function(self, cards)
-        self.id = "uninitialized"
+        self.id = generateID()
         self.name = "uninitialized"
         self.pad = 0
         self.x = 0
@@ -21,7 +28,6 @@ Container = Class {
 
 
 function Container:updateDimensions(data)
-    self.id = data.id
     self.name = data.name
     self.pad = data.pad
     self.x = data.x

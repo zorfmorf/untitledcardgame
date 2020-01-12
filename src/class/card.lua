@@ -15,7 +15,7 @@ Card = Class {
 
     init = function(self, data)
         self.id = generateID()
-        self.data = data
+        self.data = shallowCopy(data) -- we don't want to deep copy the image objects
         self.back = res.card.back -- load this from the settings somewhere or something
         self.drawPos = {} -- container to save draw positions into
         self.flipped = false -- whether to flip the cards in around
@@ -109,6 +109,12 @@ function Card:draw(id)
     local y = d.y
 
     if self.held then
+        -- draw a red rectangle at the origin position
+        local r, g, b, a = love.graphics.getColor()
+        love.graphics.setColor(1.0, 0.5, 0.5, 0.8)
+        love.graphics.rectangle("line", math.floor(d.x - self:getWidth() * 0.5), math.floor(d.y - self:getHeight() * 0.5), self:getWidth(), self:getHeight())
+        love.graphics.setColor(r, g, b, a)
+
         x = love.mouse.getX() + self.held.x
         y = love.mouse.getY() + self.held.y
     end

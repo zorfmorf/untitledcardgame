@@ -1,9 +1,9 @@
 
 --- General definition of each existing card
-local cards = {}
+local cardData = {}
 
 
-cards.placeholder = {
+cardData.placeholder = {
     img = "placeholder", -- the image to be displayed in the center
     base = "base",
     title = "The Card of Cards",
@@ -15,4 +15,4 @@ cards.placeholder = {
 }
 
 
-return cards
+return cardData
