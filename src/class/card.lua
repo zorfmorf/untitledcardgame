@@ -9,13 +9,12 @@ Card = Class {
     init = function(self, data)
         self.id = math.random(1000000, 99999999)
         self.data = data
-        self.img = res.card[self.data.img]
+        self.back = res.card.back -- load this from the settings somewhere or something
         self.drawPos = {} -- container to save draw positions into
         self.animState = {
             mouseover = { increase = false, dt = 0.0 },
             r = 0
         }
-        if not self.img then log:err("Could not locate card image resource", self.data.img) end
     end,
 
     -- !! any variables defined outside of init scoped are global !!
@@ -48,6 +47,14 @@ end
 
 
 function Card:update(dt)
+
+    --- If the img is not set yet, we need to build it once
+    --- Reduces overall draw operations by a lot since we will only have one draw operation by card
+    if not self.img then
+
+
+    end
+
     if self.animState.mouseover.increase then
         self.animState.mouseover.dt = math.min(1.0, self.animState.mouseover.dt + dt * 8)
     else
@@ -56,13 +63,39 @@ function Card:update(dt)
 end
 
 
+function Card:generateImage()
+    local font = r.font.pixel
+    local base = res.card[self.data.base]
+    self.img = love.graphics.newCanvas(base:getWidth(), base:getHeight())
+    love.graphics.setCanvas(self.img)
+    love.graphics.setFont(font)
+    love.graphics.draw(base, 0, 0)
+    love.graphics.setColor(0, 0, 0)
+    local textW = self.img:getWidth() - 6
+    love.graphics.printf(self.data.title, 3, -1, textW, "center")
+    local w, t = font:getWrap(self.data.description, textW)
+    if #t > 4 then love.graphics.setFont(r.font.pixelSmaller) end
+    w, t = r.font.pixelSmaller:getWrap(self.data.description, textW)
+    if #t > 5 then love.graphics.setFont(r.font.pixelSmall) end
+    love.graphics.printf(self.data.description, 3, math.floor(self.img:getHeight() * 0.55), textW, "center")
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.setCanvas()
+    if not self.img then log:err("Could not locate card image resource", self.data.img) end
+end
+
+
 function Card:draw(id)
+    if not self.img then self:generateImage() end
+
     love.graphics.setColor(1.0, 1.0, 1.0)
     local dt = self.animState.mouseover.dt
     local d = self.drawPos[id]
     local s = self:getDrawScale(id) -- increase size on mouse over
+
+    love.graphics.setBlendMode("alpha", "premultiplied")
     love.graphics.draw(self.img, d.x, math.floor(d.y - dt * 10), self.animState.r, s, s,
             math.floor(self:getWidth() * 0.5), math.floor(self:getHeight() * 0.5))
+    love.graphics.setBlendMode("alpha")
 end
 
 
@@ -79,12 +112,12 @@ end
 
 
 function Card:getHeight()
-    return self.img:getHeight()
+    return self.back:getHeight()
 end
 
 
 function Card:getWidth()
-    return self.img:getWidth()
+    return self.back:getWidth()
 end
 
 

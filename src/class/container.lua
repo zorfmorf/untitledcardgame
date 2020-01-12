@@ -51,6 +51,9 @@ end
 function Container:update(dt)
     self:updateCardDrawPositions()
     self:updateMouseOver(dt)
+    for _, card in pairs(self.cards) do
+        card:update(dt)
+    end
 end
 
 
@@ -159,7 +162,6 @@ function Container:updateMouseOver(dt)
         else
             mouseCaught = card:checkMouseOver(x, y)
         end
-        card:update(dt)
     end
 end
 
