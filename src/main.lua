@@ -40,7 +40,9 @@ end
 
 
 function love.draw()
-    love.graphics.print(love.timer.getFPS(), love.graphics.getWidth() - 20, 5)
+    love.graphics.setColor(1.0, 1.0, 1.0)
+    love.graphics.setFont(r.font.pixelLarge)
+    love.graphics.print(love.timer.getFPS(), love.graphics.getWidth() - 30, 5)
 end
 
 

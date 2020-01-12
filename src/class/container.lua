@@ -127,16 +127,28 @@ end
 ---@return number the scaling used for the card
 function Container:draw()
 
+    local redrawCard = nil
+
     -- just draw all cards from left to right
     for _, card in ipairs(self.cards) do
 
-        card:draw(self.id)
+        -- if the card is hovered over, skip drawing now so we can draw it last (on top)
+        if card.animState.mouseover.increase then
+            redrawCard = card
+        else
+            card:draw(self.id)
+        end
 
         if DRAW_DEBUG_OUTLINES then
             -- draw a red dot to each card's draw position
             love.graphics.setColor(1.0, 0.0, 0.0)
             love.graphics.rectangle("fill", card:getX(self.id) - 1, card:getY(self.id) - 1, 3, 3)
         end
+    end
+
+    -- draw this card last (on top) if applicable
+    if redrawCard then
+        redrawCard:draw(self.id)
     end
 
     if DRAW_DEBUG_OUTLINES then

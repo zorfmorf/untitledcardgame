@@ -50,13 +50,21 @@ function cardGame:recalculateDimensions()
         w = stackWidth,
         h = math.floor(height * 0.3)
     })
+
+    local cards = self.containers.hand.cards
+    local handWidthMax = width - stackWidth * 2 - d.pad * 4
+    local handWith = handWidthMax
+    if #cards > 0 then
+        local pw = cards[1]:getWidth() * cards[1]:getScale(d.id)
+        handWith = math.min(pw * #cards * 0.6, handWidthMax)
+    end
     self.containers.hand:updateDimensions({
         id = d.id,
         name = "Player hand card area",
         pad = d.pad,
-        x = d.pad + stackWidth + d.pad,
+        x = d.pad + stackWidth + d.pad + math.floor((handWidthMax - handWith) * 0.5),
         y = d.pad + self.containers.player.y + self.containers.player.h,
-        w = math.floor(width - stackWidth * 2 - d.pad * 4),
+        w = handWith,
         h = math.floor(height * 0.3)
     })
     self.containers.cemetery:updateDimensions({

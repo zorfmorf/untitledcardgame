@@ -48,13 +48,6 @@ end
 
 function Card:update(dt)
 
-    --- If the img is not set yet, we need to build it once
-    --- Reduces overall draw operations by a lot since we will only have one draw operation by card
-    if not self.img then
-
-
-    end
-
     if self.animState.mouseover.increase then
         self.animState.mouseover.dt = math.min(1.0, self.animState.mouseover.dt + dt * 8)
     else
@@ -134,7 +127,7 @@ end
 --- Return the current card scale used for the given container id
 ---@param id number Container id to calculate the scale for
 function Card:getScale(id)
-    return self.drawPos[id].scale
+    if self.drawPos[id] then return self.drawPos[id].scale else return 1 end
 end
 
 
