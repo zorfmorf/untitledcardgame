@@ -55,6 +55,11 @@ function cardGameOverlay:enter()
     self.containers.card = Container( { globalCardState.overlay } )
     self.containers.rightText = TextContainer(globalCardState.overlay:getRightText())
 
+    self.bg = love.graphics.newCanvas()
+    love.graphics.setCanvas(self.bg)
+    state_card_game:draw()
+    love.graphics.setCanvas()
+
     self:resize()
 end
 
@@ -69,10 +74,12 @@ end
 ---@param dt number time since last update in seconds
 function cardGameOverlay:update(dt)
     self.containers.card:update(dt)
+    self.containers.card:resetAnimationState()
     local scale = self.containers.card:getCurrentCardScale()
 
     self.containers.leftText.scale = scale
     self.containers.leftText:update(dt)
+
     self.containers.rightText.scale = scale
     self.containers.rightText:update(dt)
 end
@@ -80,6 +87,10 @@ end
 
 --- Draw all card containers including their cards
 function cardGameOverlay:draw()
+
+    love.graphics.setColor(1.0, 1.0, 1.0, 0.1)
+    love.graphics.draw(self.bg)
+    love.graphics.setColor(1.0, 1.0, 1.0, 1.0)
 
     for _, container in pairs(self.containers) do
         container:draw()
@@ -105,6 +116,7 @@ function cardGameOverlay:leave()
     log:debug("Leaving overlay game state")
     globalCardState.overlay.drawPos[d.id] = nil -- TODO probably should do this through a method
     globalCardState.overlay = nil
+    hand:clear()
 end
 
 

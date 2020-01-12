@@ -43,6 +43,16 @@ function Container:put(card)
 end
 
 
+function Container:remove(card)
+    for i, c in pairs(self.cards) do
+        if c.id == card.id then
+            table.remove(self.cards, i)
+            break
+        end
+    end
+end
+
+
 function Container:getCards()
     return self.cards
 end
@@ -53,6 +63,13 @@ function Container:update(dt)
     self:updateMouseOver(dt)
     for _, card in pairs(self.cards) do
         card:update(dt)
+    end
+end
+
+
+function Container:resetAnimationState()
+    for _, card in pairs(self.cards) do
+        card:resetAnimationState()
     end
 end
 
@@ -127,34 +144,38 @@ end
 ---@return number the scaling used for the card
 function Container:draw()
 
-    local redrawCard = nil
+    local highLightCard = nil
 
     -- just draw all cards from left to right
     for _, card in ipairs(self.cards) do
 
-        -- if the card is hovered over, skip drawing now so we can draw it last (on top)
-        if card.animState.mouseover.increase then
-            redrawCard = card
-        else
-            card:draw(self.id)
+        -- a held card is drawn after all the containers are finished
+        if not card:isHeld() then
+            -- if the card is hovered over, skip drawing now so we can draw it last (on top)
+            if card.animState.mouseover.increase then
+                highLightCard = card
+            else
+                card:draw(self.id)
+            end
         end
 
         if DRAW_DEBUG_OUTLINES then
             -- draw a red dot to each card's draw position
+            local c = love.graphics.getColor()
             love.graphics.setColor(1.0, 0.0, 0.0)
             love.graphics.rectangle("fill", card:getX(self.id) - 1, card:getY(self.id) - 1, 3, 3)
+            love.graphics.setColor(c)
         end
     end
 
     -- draw this card last (on top) if applicable
-    if redrawCard then
-        redrawCard:draw(self.id)
+    if highLightCard then
+        highLightCard:draw(self.id)
     end
 
     if DRAW_DEBUG_OUTLINES then
 
         -- draw an outline around the container
-        love.graphics.setColor(1.0, 1.0, 1.0)
         love.graphics.rectangle("line", self.x, self.y, self.w, self.h)
         love.graphics.printf(self.name, self.x, self.y + 10, self.w, "center")
 
@@ -186,8 +207,12 @@ end
 
 --- See if the mouse click is hitting any of the cards in the given container.
 ---@return table the card that caught the click or nil
-function Container:catchMouseClick(x, y)
+function Container:catchMouseClick(x, y, containerOnly)
     if isInContainer(self, x, y) then
+
+        -- no further hit detection necessary in this case
+        if containerOnly then return true end
+
         -- iterate in reverse so we correctly match overlapping cards (topmost first)
         for i = #self.cards, 1, -1 do
             if self.cards[i]:collides(self.id, x, y) then

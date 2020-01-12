@@ -5,7 +5,6 @@ StackContainer = Class {
 
     init = function(self, cards)
         Container.init(self, cards)
-        self.flipped = false -- whether to flip the cards in around
     end
 
 }

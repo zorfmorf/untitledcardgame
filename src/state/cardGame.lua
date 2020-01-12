@@ -92,6 +92,8 @@ function cardGame:enter()
     self.containers.cemetery.flipped = true
 
     self:resize()
+
+    hand:init()
 end
 
 
@@ -107,37 +109,33 @@ function cardGame:update(dt)
     for _, container in pairs(self.containers) do
         container:update(dt)
     end
+    hand:update(dt)
 end
 
 
 --- Draw all card containers including their cards
 function cardGame:draw()
 
+    if DRAW_DEBUG_OUTLINES then
+        love.graphics.line(love.graphics.getWidth() * 0.5, 0, love.graphics.getWidth() * 0.5, love.graphics.getHeight())
+    end
+
     for _, container in pairs(self.containers) do
         container:draw()
     end
 
-    if DRAW_DEBUG_OUTLINES then
-        love.graphics.line(love.graphics.getWidth() * 0.5, 0, love.graphics.getWidth() * 0.5, love.graphics.getHeight())
-    end
+    hand:draw()
+
 end
 
 
 function cardGame:mousepressed(x, y, button, isTouch, presses)
-    if button == 1 then
+    hand:mousepressed(x, y, button, isTouch, presses, self.containers)
+end
 
-        local result = false
-        for _, container in pairs(self.containers) do
-            result = container:catchMouseClick(x, y)
-            if result then break end
-        end
 
-        if result then
-            globalCardState.overlay = result
-            log:debug("Entering overlay game state")
-            GameState.push(state_card_game_overlay)
-        end
-    end
+function cardGame:mousereleased(x, y, button, isTouch, presses)
+    hand:mousereleased(x, y, button, isTouch, presses, self.containers)
 end
 
 

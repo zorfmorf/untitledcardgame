@@ -17,6 +17,11 @@ local function getTextHeight(text, width, font)
 end
 
 
+function TextContainer:update(dt)
+
+end
+
+
 --- Draw the specified text into the given container
 function TextContainer:draw()
 
