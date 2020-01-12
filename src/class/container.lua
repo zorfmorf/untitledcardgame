@@ -15,7 +15,7 @@ Container = Class {
         self.cards = cards
     end
 
-    -- !! any variables defined outside of init scoped are global !!
+    -- !! any variables defined outside of init scope are global !!
 
 }
 
@@ -36,7 +36,7 @@ function Container:canReceiveCard()
 end
 
 
-function Container:receiveCard(card)
+function Container:put(card)
     if self:canReceiveCard() then
         table.insert(self.cards, card)
     end

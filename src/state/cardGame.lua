@@ -79,8 +79,9 @@ function cardGame:enter()
     self.containers.enemy = Container(globalCardState.enemyArea)
     self.containers.player = Container(globalCardState.playerArea)
     self.containers.hand = Container(globalCardState.playerHand)
-    self.containers.stack = Container(globalCardState.playerStack)
-    self.containers.cemetery = Container(globalCardState.playerCemetery)
+    self.containers.stack = StackContainer(globalCardState.playerStack)
+    self.containers.cemetery = StackContainer(globalCardState.playerCemetery)
+    self.containers.cemetery.flipped = true
 
     self:resize()
 end
