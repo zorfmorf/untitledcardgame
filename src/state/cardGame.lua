@@ -13,7 +13,6 @@ function cardGame:recalculateDimensions()
     d.pad = math.floor(height * 0.02)
 
     self.containers.top:updateDimensions({
-        id = d.id,
         name = "Top bar",
         pad = d.pad,
         x = d.pad,
@@ -22,7 +21,6 @@ function cardGame:recalculateDimensions()
         h = math.floor(height* 0.05)
     })
     self.containers.enemy:updateDimensions({
-        id = d.id,
         name = "Enemy card area",
         pad = d.pad,
         x = d.pad,
@@ -31,7 +29,6 @@ function cardGame:recalculateDimensions()
         h = math.floor(height * 0.3)
     })
     self.containers.player:updateDimensions({
-        id = d.id,
         name = "Player card area",
         pad = d.pad,
         x = d.pad,
@@ -42,7 +39,6 @@ function cardGame:recalculateDimensions()
 
     local stackWidth = math.floor(width  * 0.2)
     self.containers.stack:updateDimensions({
-        id = d.id,
         name = "Stack",
         pad = d.pad,
         x = d.pad,
@@ -59,7 +55,6 @@ function cardGame:recalculateDimensions()
         handWith = math.min(pw * #cards * 0.6, handWidthMax)
     end
     self.containers.hand:updateDimensions({
-        id = d.id,
         name = "Player hand card area",
         pad = d.pad,
         x = d.pad + stackWidth + d.pad + math.floor((handWidthMax - handWith) * 0.5),
@@ -68,7 +63,6 @@ function cardGame:recalculateDimensions()
         h = math.floor(height * 0.3)
     })
     self.containers.cemetery:updateDimensions({
-        id = d.id,
         name = "Cemetery",
         pad = d.pad,
         x = width - d.pad - stackWidth,

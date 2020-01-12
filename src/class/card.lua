@@ -38,6 +38,11 @@ function Card:setDrawPosition(id, x, y, scale)
 end
 
 
+function Card:removeDrawPosition(id)
+    self.drawPos[id] = nil
+end
+
+
 function Card:resetAnimationState()
     self.animState = {
         mouseover = { increase = false, dt = 0.0 },

@@ -16,7 +16,6 @@ function cardGameOverlay:recalculateDimensions()
     local thirdWidth = math.floor((width - d.pad * 4) / 3)
 
     self.containers.leftText:updateDimensions({
-        id = d.id,
         name = "Left text area",
         pad = d.pad,
         x = d.pad,
@@ -26,7 +25,6 @@ function cardGameOverlay:recalculateDimensions()
     })
 
     self.containers.card:updateDimensions({
-        id = d.id,
         name = "Card area",
         pad = d.pad,
         x = d.pad * 2 + thirdWidth,
@@ -36,7 +34,6 @@ function cardGameOverlay:recalculateDimensions()
     })
 
     self.containers.rightText:updateDimensions({
-        id = d.id,
         name = "Right text area",
         pad = d.pad,
         x = d.pad * 3 + 2 * thirdWidth,
