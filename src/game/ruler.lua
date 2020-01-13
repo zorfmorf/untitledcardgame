@@ -19,13 +19,13 @@ end
 ---@param card table the card that was clicked
 ---@param container table the container the card is currently in
 function ruler:cardClick(card, container)
-    log:debug("Player clicks on card", card.id)
+    log:debug("Player clicks card", card.id, card.data.title)
     if container.type == "stack" then
         if container.id == state_card_game.containers.stack.id then
             local card = container:drawCard()
             if card then
                 card:flip()
-                log:debug("Player draws card", card.id)
+                log:debug("Player draws card", card.id, card.data.title)
                 state_card_game.containers.hand:put(card)
             end
         end
@@ -37,9 +37,19 @@ function ruler:cardClick(card, container)
 end
 
 
-function ruler:cardClickSecondary()
+function ruler:cardClickSecondary(card, container)
     if container.type == "stack" then
-        container:shuffle()
+        if container.id == state_card_game.containers.stack.id then
+            container:shuffle()
+        end
+        if container.id == state_card_game.containers.cemetery.id then
+            while #container:getCards() > 0 do
+                local c = container:drawCard()
+                c:flip()
+                state_card_game.containers.stack:put(c)
+            end
+            state_card_game.containers.stack:shuffle()
+        end
     end
 end
 

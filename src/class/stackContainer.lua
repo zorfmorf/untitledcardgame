@@ -17,7 +17,7 @@ StackContainer = Class {
 function StackContainer:shuffle()
     local cardList = {}
     while #self.cards > 0 do
-        table.insert(cardList, table.remove(math.random(1, #self.cards)))
+        table.insert(cardList, table.remove(self.cards, math.random(1, #self.cards)))
     end
     -- we need to put them back into the same table so the table id stays consistent in the globalCardState TODO refactor
     for i, c in ipairs(cardList) do
@@ -28,7 +28,7 @@ end
 
 --- Draw the topmost card (the one on index 1)
 function StackContainer:drawCard()
-    local card = nil
+    local card
     if #self.cards > 0 then
         card = table.remove(self.cards, 1)
         card:removeDrawPosition(self.id)

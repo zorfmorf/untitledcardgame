@@ -94,6 +94,11 @@ function hand:mousereleased( x, y, button, istouch, presses, containers)
                     ruler:cardClick(result.card, result.container)
                 end
             end
+            if button == MOUSE_RIGHT then
+                if self.rightClick and result.card == self.rightClick.card and self.rightClickTime < CLICK_TIME_HOLD then
+                    ruler:cardClickSecondary(result.card, result.container)
+                end
+            end
         end
 
     end

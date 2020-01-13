@@ -56,7 +56,7 @@ function Container:remove(card)
         if c.id == card.id then
             local c = table.remove(self.cards, i)
             c:removeDrawPosition(self.id)
-            break
+            return c
         end
     end
 end
