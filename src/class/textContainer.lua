@@ -7,6 +7,7 @@ TextContainer = Class {
         Container.init(self, {})
         self.text = text
         self.scale = 1
+        self.dragInteractions = false
     end
 
 }

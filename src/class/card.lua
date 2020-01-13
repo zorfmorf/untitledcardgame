@@ -99,6 +99,17 @@ function Card:generateImage()
 end
 
 
+--- draw a red rectangle at the given position
+function Card:drawOutline(id)
+    local d = self.drawPos[id]
+    local r, g, b, a = love.graphics.getColor()
+    love.graphics.setColor(1.0, 0.5, 0.5, 0.8)
+    love.graphics.rectangle("line", math.floor(d.x - self:getWidth() * 0.5),
+            math.floor(d.y - self:getHeight() * 0.5), self:getWidth(), self:getHeight())
+    love.graphics.setColor(r, g, b, a)
+end
+
+
 function Card:draw(id)
     if not self.img then self:generateImage() end
 
@@ -114,11 +125,8 @@ function Card:draw(id)
     local y = d.y
 
     if self.held then
-        -- draw a red rectangle at the origin position
-        local r, g, b, a = love.graphics.getColor()
-        love.graphics.setColor(1.0, 0.5, 0.5, 0.8)
-        love.graphics.rectangle("line", math.floor(d.x - self:getWidth() * 0.5), math.floor(d.y - self:getHeight() * 0.5), self:getWidth(), self:getHeight())
-        love.graphics.setColor(r, g, b, a)
+
+        self:drawOutline(id)
 
         x = love.mouse.getX() + self.held.x
         y = love.mouse.getY() + self.held.y

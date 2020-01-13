@@ -35,7 +35,7 @@ function hand:update(dt)
     if not self.holding then
         if self.leftClick then
             self.leftClickTime = self.leftClickTime + dt
-            if self.leftClickTime >= CLICK_TIME_HOLD then
+            if self.leftClickTime >= CLICK_TIME_HOLD and self.leftClick.container:canDrag() then
                 self:hold(self.leftClick, self.leftClick.x, self.leftClick.y)
             end
         end

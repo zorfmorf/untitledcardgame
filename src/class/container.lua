@@ -13,6 +13,7 @@ Container = Class {
 
     init = function(self, cards)
         self.id = generateID()
+        self.type = "container"
         self.name = "uninitialized"
         self.pad = 0
         self.x = 0
@@ -20,6 +21,7 @@ Container = Class {
         self.w = 0
         self.h = 0
         self.cards = cards
+        self.dragInteractions = true
     end
 
     -- !! any variables defined outside of init scope are global !!
@@ -89,8 +91,10 @@ function Container:updateCardDrawPositions()
 
     local s = 1 -- scale factor for card
 
+    local n = self:cardWidth()
+
     -- nothing to be done if there are no cards
-    if #self.cards == 0 then return s end
+    if n == 0 then return s end
 
     local maxW = self.w
     local maxH = self.h
@@ -115,7 +119,7 @@ function Container:updateCardDrawPositions()
     local h = math.floor(originalH * s)
 
     local xCenterOfContainer = self.x + maxW * 0.5
-    local widthOfAllCards = #self.cards  * w + (#self.cards - 1) * pad
+    local widthOfAllCards = n  * w + (n - 1) * pad
 
     -- the x location of the leftmost card to draw (center of card)
     local xLoc = math.floor( xCenterOfContainer - 0.5 * (widthOfAllCards - w))
@@ -137,8 +141,8 @@ function Container:updateCardDrawPositions()
         local x = xLoc + (i - 1) * (w + pad)
 
         -- xShift moves cards further to the center. the further away from the center, the more xShift is applied
-        if #self.cards > 1 then
-            x = x + xShift * (1 - ((i - 1) / (#self.cards - 1)) * 2)
+        if n > 1 then
+            x = x + xShift * (1 - ((i - 1) / (n - 1)) * 2)
         end
 
         card:setDrawPosition(self.id, x, yLoc, s)
@@ -146,6 +150,14 @@ function Container:updateCardDrawPositions()
 
     return s
 end
+
+
+--- How many cards are next to each other. Mainly needed so that stacks can override this so they always get drawn
+--- as a one card stack
+function Container:cardWidth()
+    return #self.cards
+end
+
 
 --- Draws all given cards into the specified container
 ---@return number the scaling used for the card
@@ -230,9 +242,15 @@ function Container:catchMouseClick(x, y, containerOnly)
     return nil
 end
 
+
 function Container:getCurrentCardScale()
     if #self.cards > 0 then
         return self.cards[1]:getScale(self.id)
     end
     return 1
+end
+
+
+function Container:canDrag()
+    return self.dragInteractions
 end

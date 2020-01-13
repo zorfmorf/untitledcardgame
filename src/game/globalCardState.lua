@@ -8,5 +8,4 @@ globalCardState.playerHand = {}
 globalCardState.playerStack = {}
 globalCardState.playerCemetery = {}
 
-
 return globalCardState
